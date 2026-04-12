@@ -1663,7 +1663,7 @@ function showAchievementPanel() {
     var collected = !!cards[c.id];
     var rarity = RARITY_LABELS[c.rarity || 'common'] || RARITY_LABELS.common;
     if (collected) {
-      var miniImg = c.fullImage || c.avatarImage || '';
+      var miniImg = c.avatarImage || '';
       var miniContent = miniImg ? '<img class="card-mini-img" src="' + miniImg + '">' : '<div class="card-mini-emoji">' + c.emoji + '</div>';
       html += '<div class="card-mini" onclick="showCardDetail(\'' + c.id + '\')" style="cursor:pointer">'
         + miniContent
