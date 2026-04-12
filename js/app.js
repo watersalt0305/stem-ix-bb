@@ -806,7 +806,8 @@ function exportPostCard(id) {
   // 评论
   if (commentLines.length > 0) {
     y += 12;
-    ctx.strokeStyle = '#222222';
+    ctx.strokeStyle = '#cccccc';
+    ctx.lineWidth = 0.5;
     ctx.beginPath();
     ctx.moveTo(padX, y - 6);
     ctx.lineTo(W - padX, y - 6);
