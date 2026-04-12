@@ -31,14 +31,23 @@ var DEFAULT_FORUMS = [
       easter: '// 系统运行中。人生。'
     },
     welcomePopup: {
-      title: 'STEM-IX',
+      title: 'STEM-IX v3.1.4',
       lines: [
+        '// STEM Internal eXchange',
+        '// 系统状态：运行中',
+        '',
         '欢迎访问STEM内部社区。',
+        '',
+        '当前权限等级：已验证',
+        '在线节点：正常',
+        '上次维护：昨天（咖啡机，第37次）',
         '',
         '请注意信息安全等级。',
         '禁止在此发布涉密实验数据。',
         '',
-        '— CROVET 安全系统'
+        '— CROVET 安全系统',
+        '// 附注：如遇异常请联系 <CielSky>',
+        '// 他大概在喝咖啡。人生。'
       ]
     }
   },
