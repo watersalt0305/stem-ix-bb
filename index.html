@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>ShardBB</title>
+  <link rel="stylesheet" href="css/style.css?v=99">
+</head>
+<body data-theme="terminal">
+
+  <!-- 顶栏 -->
+  <header class="top-bar">
+    <div class="top-left">
+      <img class="forum-logo" id="forumLogo" src="" alt="" style="display:none">
+      <div class="logo" id="forumTitle">STEM-IX</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon user-btn" onclick="openProfile()" title="我的资料" id="userBtn"></button>
+      <span class="post-count-badge" id="postCount">0 帖</span>
+      <button class="btn-icon" id="charBtn" onclick="openCharacters()" title="角色管理" style="display:none">👥</button>
+<button class="btn-icon" onclick="showAchievementPanel()" title="成就&角色卡">✦</button>
+<button class="btn-icon" onclick="openSettings()" title="全局API设置">⚙</button>
+<button class="btn-icon" onclick="openAdmin()" title="管理员">⊕</button>
+    </div>
+  </header>
+
+  <!-- 论坛切换 -->
+  <nav class="forum-nav" id="forumTabs"></nav>
+
+  <!-- 发帖区 -->
+  <section class="composer">
+    <div class="composer-tabs">
+<button class="tab-btn active" data-tab="user" onclick="switchTab('user')">✎ 我来发帖</button>
+<button class="tab-btn" data-tab="ai" onclick="switchTab('ai')">◈ 让角色发帖</button>
+    </div>
+
+    <div class="form-row">
+      <label>板块</label>
+      <select class="form-input" id="boardSelect"></select>
+    </div>
+
+    <div class="tab-content active" id="tab-user">
+      <div class="form-row">
+        <label>标题</label>
+        <input class="form-input" id="userTitle" placeholder="帖子标题…" maxlength="60">
+      </div>
+      <div class="form-row">
+        <label>内容</label>
+        <textarea class="form-input" id="userContent" placeholder="写点什么…" maxlength="500"></textarea>
+      </div>
+      <div class="composer-footer">
+        <button class="btn-post" onclick="userPost()">发布帖子</button>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-ai">
+      <div class="form-row">
+        <label>给角色一个话题（可选）</label>
+        <textarea class="form-input" id="aiTopic" placeholder="留空则随机选话题…" maxlength="200"></textarea>
+      </div>
+      <div class="composer-footer">
+        <button class="btn-post" onclick="aiPost()">✨ 随机角色发帖</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 论坛首页信息区 -->
+  <section class="forum-info" id="forumInfo"></section>
+
+  <!-- 帖子流 -->
+  <section class="feed" id="feed"></section>
+
+  <!-- 非阻塞状态条 -->
+  <div class="status-bar" id="statusBar"></div>
+
+  <!-- Loading -->
+  <div class="overlay" id="loadingOverlay">
+    <div class="modal loading-card">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">处理中…</p>
+      <p class="loading-sub" id="loadingSub">请稍候 ✨</p>
+    </div>
+  </div>
+
+  <!-- 全局API设置 -->
+  <div class="overlay" id="settingsOverlay" onclick="if(event.target===this)closeSettings()">
+    <div class="modal">
+      <h3>⚙️ 全局API设置</h3>
+      <div class="form-row">
+        <label>协议类型</label>
+        <select class="form-input" id="cfgType">
+          <option value="openai">OpenAI 兼容</option>
+          <option value="anthropic">Anthropic</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>API Base URL</label>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px">留空使用内置API（无需配置即可使用）</div>
+        <input class="form-input" id="cfgUrl" placeholder="留空使用默认API，或填自己的URL">
+      </div>
+      <div class="form-row">
+        <label>API Key</label>
+        <input class="form-input" id="cfgKey" type="password" placeholder="留空使用默认API，或填自己的Key">
+      </div>
+      <div class="form-row">
+        <label>模型</label>
+        <div style="display:flex;gap:6px;align-items:center">
+          <select class="form-input" id="cfgModel" style="flex:1"><option value="">-- 手动输入或拉取 --</option></select>
+          <button class="btn-post" style="padding:8px 12px;font-size:12px;white-space:nowrap" onclick="fetchModels()">📡 拉取</button>
+        </div>
+<input class="form-input" id="cfgModelManual" placeholder="或手动输入模型名…" style="margin-top:6px">
+        </div>
+        <hr class="divider">
+        <div class="form-row">
+          <label>代理地址</label>
+          <input class="form-input" id="cfgProxy" placeholder="direct = 直连(WebView), 或填代理URL">
+          <p class="hint" style="margin-top:4px;font-size:11px">WebView预览填 direct 即可；外部浏览器填 CF Worker 地址或本地代理</p>
+        </div>
+        <div class="composer-footer">
+        <button class="btn-post btn-cancel" onclick="closeSettings()">取消</button>
+        <button class="btn-post" onclick="saveSettingsForm()">保存</button>
+      </div>
+      <p class="hint">💡 角色可设置独立API，不填则使用此全局配置。无API时使用预设Mock回复。</p>
+    </div>
+  </div>
+
+  <!-- 角色管理 -->
+  <div class="overlay" id="charsOverlay" onclick="if(event.target===this)closeCharacters()">
+    <div class="modal modal-wide">
+      <h3>👥 角色管理</h3>
+      <div id="charList"></div>
+      <div class="composer-footer">
+        <button class="btn-post" onclick="editChar(null)">➕ 新建角色</button>
+        <button class="btn-post btn-cancel" onclick="closeCharacters()">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 角色编辑 -->
+  <div class="overlay" id="charEditOverlay" data-char-id="">
+    <div class="modal modal-wide">
+      <h3>📝 编辑角色</h3>
+      <div id="charEditContent"></div>
+      <div class="composer-footer">
+        <button class="btn-post btn-cancel" onclick="document.getElementById('charEditOverlay').classList.remove('show')">取消</button>
+        <button class="btn-post" onclick="saveCharEdit()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 头像裁剪 -->
+  <div class="overlay" id="cropOverlay">
+    <div class="modal">
+      <h3>✂️ 裁剪头像</h3>
+      <div class="crop-container">
+        <canvas id="cropCanvas" width="256" height="256"></canvas>
+      </div>
+      <div class="form-row">
+        <label>缩放</label>
+        <input type="range" id="cropZoom" min="0.1" max="3" step="0.05" value="1" class="crop-slider" oninput="drawCrop()">
+      </div>
+      <div class="form-row">
+        <label>水平偏移</label>
+        <input type="range" id="cropX" min="-200" max="200" step="1" value="0" class="crop-slider" oninput="drawCrop()">
+      </div>
+      <div class="form-row">
+        <label>垂直偏移</label>
+        <input type="range" id="cropY" min="-200" max="200" step="1" value="0" class="crop-slider" oninput="drawCrop()">
+      </div>
+      <div class="composer-footer">
+        <button class="btn-post btn-cancel" onclick="closeCrop()">取消</button>
+        <button class="btn-post" onclick="applyCrop()">确认裁剪</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 用户资料 -->
+  <div class="overlay" id="profileOverlay" onclick="if(event.target===this)closeProfile()">
+    <div class="modal">
+      <h3>👤 我的资料</h3>
+      <div class="profile-avatar-section">
+        <div class="profile-avatar" id="profileAvatarPreview"></div>
+        <div class="profile-avatar-actions">
+          <button class="btn-sm" onclick="randomizeAvatar()">🎲 随机头像</button>
+          <label class="btn-sm" style="cursor:pointer">📷 上传头像 <input type="file" accept="image/*" onchange="uploadAvatar(event)" style="display:none"></label>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>用户名</label>
+        <input class="form-input" id="profileName" placeholder="你的名字…" maxlength="20">
+      </div>
+      <div class="form-row">
+        <label>自定义Emoji头像（上传图片时忽略）</label>
+        <input class="form-input" id="profileEmoji" placeholder="选个emoji…" maxlength="4">
+      </div>
+      <div class="form-row">
+        <label class="text-muted">注册时间：<span id="profileRegTime"></span></label>
+      </div>
+      <div class="composer-footer">
+        <button class="btn-post btn-cancel" onclick="closeProfile()">取消</button>
+        <button class="btn-post" onclick="saveProfile()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 管理员面板 -->
+  <div class="overlay" id="adminOverlay" onclick="if(event.target===this)closeAdmin()">
+    <div class="modal modal-wide">
+      <h3>🔐 管理员面板</h3>
+      <div id="adminContent"></div>
+    </div>
+  </div>
+
+  <!-- 进场弹窗 -->
+  <div class="overlay" id="welcomeOverlay">
+    <div class="modal welcome-modal">
+      <h3 id="welcomeTitle"></h3>
+      <div class="welcome-body" id="welcomeBody"></div>
+      <div class="composer-footer">
+        <label class="checkbox-label" style="margin-right:auto"><input type="checkbox" id="welcomeNoShow"> 本次不再显示</label>
+        <button class="btn-post" onclick="closeWelcome()">进入</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+<script src="js/data.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/patch.js"></script>
+</body>
+</html>
