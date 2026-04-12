@@ -97,6 +97,14 @@ body {
   color: var(--accent);
   letter-spacing: 1px;
 }
+.forum-subtitle {
+  font-size: 11px;
+  color: var(--text2);
+  font-family: var(--font);
+  letter-spacing: 1px;
+  margin-top: -2px;
+  opacity: 0.6;
+}
 .subtitle {
   font-size: 11px;
   color: var(--text2);
@@ -893,20 +901,70 @@ select.form-input { cursor: pointer; }
 
 .char-card {
   background: var(--card, #fff);
-  border: 3px solid #888;
-  border-radius: 16px;
-  padding: 28px 24px;
-  min-width: 260px;
-  max-width: 320px;
-  text-align: center;
+  border: 2px solid var(--border, #222);
+  border-radius: 0px;
+  padding: 0;
+  min-width: 280px;
+  max-width: 340px;
+  text-align: left;
   position: relative;
-  animation: cardBounce 0.5s ease;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  animation: cardBounce 0.4s ease;
+  box-shadow: 4px 4px 0px rgba(0,0,0,0.15);
+  overflow: hidden;
 }
-.char-card.rarity-uncommon { border-color: #4CAF50; box-shadow: 0 0 20px rgba(76,175,80,0.3); }
-.char-card.rarity-rare { border-color: #2196F3; box-shadow: 0 0 20px rgba(33,150,243,0.3); }
-.char-card.rarity-epic { border-color: #9C27B0; box-shadow: 0 0 24px rgba(156,39,176,0.4); }
-.char-card.rarity-legendary { border-color: #FF9800; box-shadow: 0 0 30px rgba(255,152,0,0.5); animation: cardBounce 0.5s ease, legendaryGlow 2s ease-in-out infinite; }
+.char-card-titlebar {
+  background: var(--bg2, #eee);
+  border-bottom: 2px solid var(--border, #222);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-family: var(--font);
+  color: var(--text2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.char-card-body {
+  display: flex;
+  padding: 16px;
+  gap: 16px;
+  align-items: flex-start;
+}
+.char-card-imgbox {
+  flex-shrink: 0;
+  width: 120px;
+}
+.char-card-imgbox img {
+  width: 100%;
+  border: 1px solid var(--border, #222);
+}
+.char-card-info {
+  flex: 1;
+  min-width: 0;
+}
+.char-card-info .card-name {
+  font-size: 16px;
+  font-weight: bold;
+  font-family: var(--font);
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.char-card-info .card-realname {
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 8px;
+}
+.char-card-info .card-bio {
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.6;
+}
+.char-card.rarity-uncommon,
+.char-card.rarity-rare,
+.char-card.rarity-epic,
+.char-card.rarity-legendary {
+  border-color: var(--border, #222);
+  box-shadow: 4px 4px 0px rgba(0,0,0,0.15);
+}
 
 @keyframes cardBounce {
   0% { transform: scale(0.3) rotate(-5deg); opacity: 0; }
@@ -1039,7 +1097,8 @@ select.form-input { cursor: pointer; }
 .card-mini.rarity-legendary { border-color: #FF9800; }
 .card-mini.card-unknown { border-color: #ccc; opacity: 0.4; }
 .card-mini-emoji { font-size: 28px; }
-.card-mini-name { font-size: 11px; margin-top: 4px; font-weight: bold; color: var(--text, #222); word-break: break-all; }
+.card-mini-img { width: 54px; height: 54px; object-fit: contain; }
+.card-mini-name { font-size: 10px; margin-top: 4px; font-weight: bold; color: var(--text, #222); word-break: break-all; font-family: var(--font); }
 .card-mini-rarity { font-size: 10px; margin-top: 2px; }
 .card-avatar-img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; margin: 8px 0; }
 .card-unknown-img { width: 28px; height: 28px; object-fit: contain; opacity: 0.5; }
