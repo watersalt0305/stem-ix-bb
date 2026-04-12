@@ -729,7 +729,7 @@ function exportPostCard(id) {
   var forumName = forum ? forum.name : 'ShardBB';
 
   // Canvas 尺寸
-  var W = 800, padX = 40, padY = 32;
+  var W = 1000, padX = 48, padY = 36;
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
 
