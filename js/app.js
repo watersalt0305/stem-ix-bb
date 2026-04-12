@@ -882,12 +882,17 @@ function wrapText(ctx, text, maxWidth) {
   return lines.length ? lines : [''];
 }
 
-// 去 HTML 标签
+// 去 HTML 标签和 Markdown 标记
 function stripHtml(html) {
   var tmp = html.replace(/<[^>]*>/g, '');
   tmp = tmp.replace(/&amp;/g, '&');
   tmp = tmp.replace(/&lt;/g, '<');
   tmp = tmp.replace(/&gt;/g, '>');
+  // 去 Markdown 标记
+  tmp = tmp.replace(/\*\*(.+?)\*\*/g, '$1');
+  tmp = tmp.replace(/\*(.+?)\*/g, '$1');
+  tmp = tmp.replace(/~~(.+?)~~/g, '$1');
+  tmp = tmp.replace(/`([^`]+)`/g, '$1');
   return tmp.trim();
 }
 
