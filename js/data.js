@@ -278,7 +278,7 @@ function getCharById(id) {
 }
 
 // ---------- 代理配置 ----------
-var DEFAULT_PROXY_URL = 'https://stem-ix-bb.shuiyanwatersalt.workers.dev';
+var DEFAULT_PROXY_URL = '/api';
 
 function getProxyUrl() {
   return localStorage.getItem('shardbb_proxy_url') || DEFAULT_PROXY_URL;
