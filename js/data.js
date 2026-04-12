@@ -265,6 +265,8 @@ function getCharacters() {
           // 始终用最新的 style 和 bio（跟随代码更新）
           c.style = def.style;
           c.bio = def.bio;
+          c.avatarImage = def.avatarImage;
+          if (def.fullImage) c.fullImage = def.fullImage;
         }
         return c;
       });
