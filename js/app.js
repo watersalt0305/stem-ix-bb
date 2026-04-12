@@ -1583,14 +1583,18 @@ function showCharCard(char) {
   var rarity = RARITY_LABELS[char.rarity || 'common'] || RARITY_LABELS.common;
   var overlay = document.createElement('div');
   overlay.className = 'char-card-overlay';
+  var cardImg = char.fullImage || char.avatarImage || '';
+  var imgHtml = cardImg ? '<img src="' + cardImg + '">' : '<div style="font-size:48px;text-align:center;padding:20px">' + (char.emoji || '?') + '</div>';
   overlay.innerHTML = '<div class="char-card rarity-' + (char.rarity || 'common') + '">'
-    + '<div class="card-close" onclick="this.parentElement.parentElement.remove()">✕</div>'
-    + '<div class="card-rarity" style="color:' + rarity.color + '">' + rarity.star + ' ' + rarity.label + '</div>'
-    + '<div class="card-emoji">' + (char.emoji || '❓') + '</div>'
+    + '<div class="char-card-titlebar"><span>STEM-IX // 用户档案</span><span class="card-close" onclick="this.closest(\'.char-card-overlay\').remove()" style="cursor:pointer">✕</span></div>'
+    + '<div class="char-card-body">'
+    + '<div class="char-card-imgbox">' + imgHtml + '</div>'
+    + '<div class="char-card-info">'
     + '<div class="card-name">' + escapeHtml(char.name) + '</div>'
-    + '<div class="card-bio">' + escapeHtml(char.bio || char.style.slice(0, 60) + '…') + '</div>'
-    + '<div class="card-count">已收集 ' + getCardCount() + '/' + getMainCharCount() + ' 张角色卡</div>'
-    + '</div>';
+    + '<div class="card-realname">' + escapeHtml(char.bio ? char.bio.split('。')[0] : '') + '</div>'
+    + '<div class="card-bio">' + escapeHtml(char.bio || char.style.slice(0, 80) + '…') + '</div>'
+    + '<div style="font-size:10px;color:var(--text2);margin-top:8px;font-family:var(--font)">已识别 ' + getCardCount() + '/' + getMainCharCount() + ' 名用户</div>'
+    + '</div></div></div>';
   document.body.appendChild(overlay);
   setTimeout(function() { overlay.classList.add('show'); }, 10);
   // 点遮罩关闭
@@ -1659,10 +1663,11 @@ function showAchievementPanel() {
     var collected = !!cards[c.id];
     var rarity = RARITY_LABELS[c.rarity || 'common'] || RARITY_LABELS.common;
     if (collected) {
-      html += '<div class="card-mini rarity-' + (c.rarity || 'common') + '" onclick="showCardDetail(\'' + c.id + '\')" style="cursor:pointer">'
-        + '<div class="card-mini-emoji">' + c.emoji + '</div>'
+      var miniImg = c.fullImage || c.avatarImage || '';
+      var miniContent = miniImg ? '<img class="card-mini-img" src="' + miniImg + '">' : '<div class="card-mini-emoji">' + c.emoji + '</div>';
+      html += '<div class="card-mini" onclick="showCardDetail(\'' + c.id + '\')" style="cursor:pointer">'
+        + miniContent
         + '<div class="card-mini-name">' + escapeHtml(c.name) + '</div>'
-        + '<div class="card-mini-rarity" style="color:' + rarity.color + '">' + rarity.star + '</div>'
         + '</div>';
     } else {
       html += '<div class="card-mini card-unknown">'
