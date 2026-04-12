@@ -729,7 +729,7 @@ function exportPostCard(id) {
   var forumName = forum ? forum.name : 'ShardBB';
 
   // Canvas 尺寸
-  var W = 600, padX = 30, padY = 24;
+  var W = 800, padX = 40, padY = 32;
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
 
@@ -770,8 +770,8 @@ function exportPostCard(id) {
   
   // 边框（黑框BBS风）
   ctx.strokeStyle = '#222222';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(4, 4, W - 8, H - 8);
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(8, 8, W - 16, H - 16);
 
   // 头部：论坛名 + 板块 + 时间
   ctx.fillStyle = '#555555';
