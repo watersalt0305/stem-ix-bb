@@ -508,7 +508,9 @@ select.form-input { cursor: pointer; }
 .post-author {
   font-size: 13px;
   font-weight: bold;
-  color: var(--accent);
+  color: #2563eb;
+  font-family: 'Courier New', 'SF Mono', monospace;
+  letter-spacing: 0.5px;
 }
 .board-tag {
   font-size: 10px;
@@ -569,7 +571,8 @@ select.form-input { cursor: pointer; }
 .comment-author {
   font-size: 12px;
   font-weight: bold;
-  color: var(--accent);
+  color: #2563eb;
+  font-family: 'Courier New', 'SF Mono', monospace;
   margin-right: 8px;
 }
 .comment-time {
