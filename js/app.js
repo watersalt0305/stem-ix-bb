@@ -431,7 +431,12 @@ function chainReply(forumId, postId, excludeId, probability, depth) {
     var char = getRandomChar(forumId, excludeId, post.board);
     showStatusBar('💬 有人正在回复…');
     
-    generateComment(char, forumId, post.title, post.content, null).then(function(text) {
+    // 获取最后一条评论作为回复对象
+    var lastComment = (post.comments || []).length > 0 ? post.comments[post.comments.length - 1] : null;
+    var replyToText = lastComment ? lastComment.content : null;
+    var replyToName = lastComment ? lastComment.author : '';
+    
+    generateComment(char, forumId, post.title, post.content, replyToText).then(function(text) {
       var freshPosts = getPosts(forumId);
       var freshPost = freshPosts.find(function(p) { return p.id === postId; });
       if (!freshPost) return;
@@ -442,6 +447,7 @@ function chainReply(forumId, postId, excludeId, probability, depth) {
         emoji: char.emoji,
         avatarImage: char.avatarImage || '',
         content: text,
+        replyTo: replyToName,
         time: new Date().toLocaleString('zh-CN'),
         type: 'ai',
       });
@@ -579,6 +585,7 @@ function userReply(postId) {
           emoji: char.emoji,
           avatarImage: char.avatarImage || '',
           content: reply,
+          replyTo: getUserProfile().name,
           time: new Date().toLocaleString('zh-CN'),
           type: 'ai',
         });
@@ -586,6 +593,8 @@ function userReply(postId) {
         renderPosts();
         hideStatusBar();
         showCharCard(char);
+        // 连锁回复
+        chainReply(forumId, postId, char.id, 0.3, 1);
       }).catch(function(e) {
         hideStatusBar();
         toast('❌ 回复失败: ' + (e.message || '未知错误').slice(0, 60), 4000);
