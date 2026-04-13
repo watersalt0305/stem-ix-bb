@@ -33,3 +33,8 @@ renderMarkdown = function(text) {
   html = html.replace(/@([^\s@,\uff0c\u3002!?\uff01\uff1f<]+)/g, '<span class="mention">@$1</span>');
   return html;
 };
+
+// 去掉帖子/评论头像，只显示名字
+renderPostAvatar = function(emoji, avatarImage, sizeClass) {
+  return '';
+};
