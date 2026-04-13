@@ -134,7 +134,7 @@ body {
 }
 .btn-icon:hover { filter: grayscale(0); }
 .btn-img { width: 22px; height: 22px; object-fit: contain; vertical-align: middle; }
-.avatar-inline { width: 22px; height: 22px; border-radius: 0; vertical-align: middle; object-fit: contain; margin-right: 2px; }
+.avatar-inline { width: 22px; height: 22px; border-radius: 50%; vertical-align: middle; object-fit: cover; margin-right: 2px; }
 .tab-icon { width: 16px; height: 16px; object-fit: contain; vertical-align: middle; margin-right: 2px; }
 
 /* ---------- 论坛切换 ---------- */
