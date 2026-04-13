@@ -726,140 +726,125 @@ var CARD_QUOTES = [
   '// 已记录。已归档。—— CROVET',
 ];
 
-function exportPostCard(id) {
-  var forumId = getActiveForum();
+function exportPostCard(id) {var forumId = getActiveForum();
   var posts = getPosts(forumId);
   var p = posts.find(function(x) { return x.id === id; });
   if (!p) return;
 
-  var isAnon = p.board === '匿名投稿箱';
-  var authorName = isAnon ? '匿名' : p.author;
+  var isAnon = p.board === '\u533f\u540d\u6295\u7a3f\u7bb1';
+  var authorName = isAnon ? '\u533f\u540d' : '@' + p.author;
   var forum = getForums().find(function(f) { return f.id === forumId; });
   var forumName = forum ? forum.name : 'ShardBB';
 
-  // Canvas 尺寸
-  var W = 1000, padX = 48, padY = 36;
+  var W = 720, padX = 32, padY = 24;
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
 
-  // 预计算文本换行
-  ctx.font = '700 18px sans-serif';
+  ctx.font = '700 16px "Courier New", monospace';
   var titleLines = wrapText(ctx, stripHtml(p.title || ''), W - padX * 2);
-  ctx.font = '14px sans-serif';
+  ctx.font = '13px "Courier New", monospace';
   var contentLines = wrapText(ctx, stripHtml(p.content || ''), W - padX * 2);
   
-  // 评论
   var commentLines = [];
-  (p.comments || []).slice(0, 5).forEach(function(c) {
-    var cn = isAnon ? '匿名' : c.author;
-    var replyPrefix = c.replyTo ? '回复@' + (isAnon ? '匿名' : c.replyTo) + ' ' : '';
-    ctx.font = '13px sans-serif';
-    var lines = wrapText(ctx, cn + '：' + replyPrefix + stripHtml(c.content), W - padX * 2 - 16);
+  var maxComments = Math.min((p.comments || []).length, 3);
+  (p.comments || []).slice(0, maxComments).forEach(function(c) {
+    var cn = isAnon ? '\u533f\u540d' : '@' + c.author;
+    var replyPrefix = c.replyTo ? '\u56de\u590d@' + (isAnon ? '\u533f\u540d' : c.replyTo) + ' ' : '';
+    ctx.font = '12px "Courier New", monospace';
+    var lines = wrapText(ctx, cn + ' ' + replyPrefix + stripHtml(c.content), W - padX * 2 - 12);
     commentLines.push(lines);
   });
   var totalCommentH = 0;
-  commentLines.forEach(function(ls) { totalCommentH += ls.length * 18 + 6; });
-  if ((p.comments || []).length > 5) totalCommentH += 20;
+  commentLines.forEach(function(ls) { totalCommentH += ls.length * 16 + 4; });
+  if ((p.comments || []).length > maxComments) totalCommentH += 16;
 
   var quoteText = CARD_QUOTES[Math.floor(Math.random() * CARD_QUOTES.length)];
-  ctx.font = '12px sans-serif';
+  ctx.font = 'italic 11px "Courier New", monospace';
   var quoteLines = wrapText(ctx, quoteText, W - padX * 2);
 
-  // 计算总高度
-  var H = padY + titleLines.length * 24 + 12 + contentLines.length * 20 + 16;
-  if (commentLines.length > 0) H += 12 + totalCommentH;
-  H += 20 + quoteLines.length * 16 + padY + 30;
+  var H = padY + 16 + 8;
+  H += titleLines.length * 20 + 6;
+  H += contentLines.length * 17 + 10;
+  if (commentLines.length > 0) H += 10+ totalCommentH;
+  H += 12+ quoteLines.length * 14+ padY + 8;
 
   canvas.width = W;
   canvas.height = H;
 
-  // 背景（论坛白底风格）
   ctx.fillStyle = '#f5f5f0';
   ctx.fillRect(0, 0, W, H);
-  
-  // 边框（黑框BBS风）
   ctx.strokeStyle = '#222222';
-  ctx.lineWidth = 1.5;
-  ctx.strokeRect(8, 8, W - 16, H - 16);
+  ctx.lineWidth = 1;
+  ctx.strokeRect(6, 6, W - 12, H - 12);
 
-  // 头部：论坛名 + 板块 + 时间
-  ctx.fillStyle = '#555555';
-  ctx.font = '12px "Courier New", monospace';
-  var headerText = forumName + (p.board ? ' · ' + p.board : '') + ' · ' + (p.time || '');
+  ctx.fillStyle = '#888888';
+  ctx.font = '11px "Courier New", monospace';
+  var headerText = forumName + (p.board ? ' / ' + p.board : '') + '' + (p.time || '');
   ctx.fillText(headerText, padX, padY);
 
-  // 作者
-  ctx.fillStyle = '#1a1a1a';
-  ctx.font = 'bold 13px "Courier New", monospace';
-  ctx.fillText(authorName, padX, padY + 18);
+  ctx.fillStyle = '#1a4a7a';
+  ctx.font = 'bold 12px "Courier New", monospace';
+  ctx.fillText(authorName, padX, padY + 14);
 
-  var y = padY + 40;
+  var y = padY + 32;
 
-  // 标题
   ctx.fillStyle = '#1a1a1a';
-  ctx.font = '700 18px "Courier New", monospace';
+  ctx.font = '700 16px "Courier New", monospace';
   titleLines.forEach(function(line) {
-    ctx.fillText(line, padX, y);
-    y += 24;
-  });
-  y += 8;
-
-  // 正文
-  ctx.fillStyle = '#333333';
-  ctx.font = '14px "Courier New", monospace';
-  contentLines.forEach(function(line) {
     ctx.fillText(line, padX, y);
     y += 20;
   });
+  y += 4;
 
-  // 评论
+  ctx.fillStyle = '#333333';
+  ctx.font = '13px "Courier New", monospace';
+  contentLines.forEach(function(line) {
+    ctx.fillText(line, padX, y);
+    y += 17;
+  });
+
   if (commentLines.length > 0) {
-    y += 12;
-    ctx.strokeStyle = '#cccccc';
+    y += 8;
+    ctx.strokeStyle = '#dddddd';
     ctx.lineWidth = 0.5;
     ctx.beginPath();
-    ctx.moveTo(padX, y - 6);
-    ctx.lineTo(W - padX, y - 6);
+    ctx.moveTo(padX, y - 4);
+    ctx.lineTo(W - padX, y - 4);
     ctx.stroke();
     
     commentLines.forEach(function(lines) {
-      ctx.fillStyle = '#555555';
-      ctx.font = '13px "Courier New", monospace';
+      ctx.fillStyle = '#666666';
+      ctx.font = '12px "Courier New", monospace';
       lines.forEach(function(line) {
-        ctx.fillText(line, padX + 8, y);
-        y += 18;
+        ctx.fillText(line, padX + 6, y);
+        y += 16;
       });
-      y += 6;
-    });
-    if ((p.comments || []).length > 5) {
-      ctx.fillStyle = '#888888';
-      ctx.font = 'italic 12px "Courier New", monospace';
-      ctx.fillText('... 还有 ' + ((p.comments.length - 5)) + ' 条评论', padX + 8, y);
-      y += 20;
+      y += 4;
+    });if ((p.comments || []).length > maxComments) {
+      ctx.fillStyle = '#999999';
+      ctx.font ='italic 11px "Courier New", monospace';
+      ctx.fillText('... \u8fd8\u6709 ' + ((p.comments.length - maxComments)) + ' \u6761\u8bc4\u8bba', padX + 6, y);y += 16;
     }
   }
 
-  // 底部引言
-  y += 16;
-  ctx.fillStyle = '#888888';
-  ctx.font = 'italic 12px "Courier New", monospace';
+  y += 10;
+  ctx.fillStyle = '#999999';
+  ctx.font = 'italic 11px "Courier New", monospace';
   quoteLines.forEach(function(line) {
     ctx.fillText(line, padX, y);
-    y += 16;
+    y += 14;
   });
 
-  // 水印
-  ctx.fillStyle = '#aaaaaa';
-  ctx.font = '11px "Courier New", monospace';
+  ctx.fillStyle = '#bbbbbb';
+  ctx.font = '10px "Courier New", monospace';
   ctx.textAlign = 'right';
-  ctx.fillText('STEM-IX · ShardBB', W - padX, H - 12);
+  ctx.fillText('STEM-IX', W - padX, H - 10);
   ctx.textAlign = 'left';
 
-  // 展示卡片预览（长按保存）
   try {
     showCardPreview(canvas.toDataURL('image/png'));
   } catch(e) {
-    toast('导出失败: ' + e.message, 3000);
+    toast('\u5bfc\u51fa\u5931\u8d25: ' + e.message, 3000);
   }
 }
 
@@ -903,6 +888,8 @@ function stripHtml(html) {
   tmp = tmp.replace(/\*(.+?)\*/g, '$1');
   tmp = tmp.replace(/~~(.+?)~~/g, '$1');
   tmp = tmp.replace(/`([^`]+)`/g, '$1');
+  // 渲染伪附件/伪链接 [xxx:yyy] -> 📎 xxx: yyy
+  tmp = tmp.replace(/\[([^\]]+?)[:：]\s*([^\]]+)\]/g, '📎 $1: $2');
   return tmp.trim();
 }
 
