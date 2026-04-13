@@ -740,9 +740,9 @@ function exportPostCard(id) {var forumId = getActiveForum();
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
 
-  ctx.font = '700 16px "Courier New", monospace';
+  ctx.font = '700 18px "Courier New", monospace';
   var titleLines = wrapText(ctx, stripHtml(p.title || ''), W - padX * 2);
-  ctx.font = '13px "Courier New", monospace';
+  ctx.font = '14px "Courier New", monospace';
   var contentLines = wrapText(ctx, stripHtml(p.content || ''), W - padX * 2);
   
   var commentLines = [];
@@ -759,7 +759,7 @@ function exportPostCard(id) {var forumId = getActiveForum();
   if ((p.comments || []).length > maxComments) totalCommentH += 16;
 
   var quoteText = CARD_QUOTES[Math.floor(Math.random() * CARD_QUOTES.length)];
-  ctx.font = 'italic 11px "Courier New", monospace';
+  ctx.font = 'italic 12px "Courier New", monospace';
   var quoteLines = wrapText(ctx, quoteText, W - padX * 2);
 
   var H = padY + 16 + 8;
@@ -789,7 +789,7 @@ function exportPostCard(id) {var forumId = getActiveForum();
   var y = padY + 32;
 
   ctx.fillStyle = '#1a1a1a';
-  ctx.font = '700 16px "Courier New", monospace';
+  ctx.font = '700 18px "Courier New", monospace';
   titleLines.forEach(function(line) {
     ctx.fillText(line, padX, y);
     y += 20;
@@ -797,7 +797,7 @@ function exportPostCard(id) {var forumId = getActiveForum();
   y += 4;
 
   ctx.fillStyle = '#333333';
-  ctx.font = '13px "Courier New", monospace';
+  ctx.font = '14px "Courier New", monospace';
   contentLines.forEach(function(line) {
     ctx.fillText(line, padX, y);
     y += 17;
@@ -829,7 +829,7 @@ function exportPostCard(id) {var forumId = getActiveForum();
 
   y += 10;
   ctx.fillStyle = '#999999';
-  ctx.font = 'italic 11px "Courier New", monospace';
+  ctx.font = 'italic 12px "Courier New", monospace';
   quoteLines.forEach(function(line) {
     ctx.fillText(line, padX, y);
     y += 14;
