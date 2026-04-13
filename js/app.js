@@ -889,7 +889,7 @@ function stripHtml(html) {
   tmp = tmp.replace(/~~(.+?)~~/g, '$1');
   tmp = tmp.replace(/`([^`]+)`/g, '$1');
   // 渲染伪附件/伪链接 [xxx:yyy] -> 📎 xxx: yyy
-  tmp = tmp.replace(/\[([^\]]+?)[:：]\s*([^\]]+)\]/g, '📎 $1: $2');
+  tmp = tmp.replace(/\[([^\[\]]+?)[：:]\s*([^\[\]]+?)\]/g, '📎 $1: $2');
   return tmp.trim();
 }
 
