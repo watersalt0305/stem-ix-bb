@@ -508,7 +508,7 @@ select.form-input { cursor: pointer; }
 .post-author {
   font-size: 13px;
   font-weight: bold;
-  color: #2563eb;
+  color: #1a4a7a;
   font-family: 'Courier New', 'SF Mono', monospace;
   letter-spacing: 0.5px;
 }
@@ -571,7 +571,7 @@ select.form-input { cursor: pointer; }
 .comment-author {
   font-size: 12px;
   font-weight: bold;
-  color: #2563eb;
+  color: #1a4a7a;
   font-family: 'Courier New', 'SF Mono', monospace;
   margin-right: 8px;
 }
