@@ -657,7 +657,7 @@ function renderPosts() {
         + '<span class="comment-author">' + cAvatar + ' ' + cName + '</span>'
         + '<span class="comment-time">' + escapeHtml(c.time) + '</span>'
         + replyBtn
-        + '<div class="comment-text">' + replyTag + renderMarkdown(c.content) + '</div>'
+        + '<div class="comment-text">' + replyTag + renderMarkdown(c.content || c.text || '') + '</div>'
         + '</div>';
     }).join('');
 
