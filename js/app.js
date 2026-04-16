@@ -621,6 +621,8 @@ function renderPosts() {
   var posts = currentBoard
     ? allPosts.filter(function(p) { return p.board === currentBoard; })
     : allPosts;
+  // 置顶帖排到最前面
+  posts.sort(function(a, b) { return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0); });
   var feed = document.getElementById('feed');
   var count = document.getElementById('postCount');
   count.textContent = allPosts.length + ' 帖';
@@ -663,15 +665,18 @@ function renderPosts() {
 
     var pAvatar = isAnon ? '🎭' : renderPostAvatar(p.emoji, p.avatarImage, 'avatar-inline');
     var pName = isAnon ? '匿名' : '@' + escapeHtml(p.author);
+    var pinnedTag = p.pinned ? '<span class="board-tag" style="background:#e74c3c;color:#fff">📌 置顶</span>' : '';
+    var viewsTag = p.views ? '<span class="btn-action" style="cursor:default">👁️ ' + p.views + '</span>' : '';
     return '<article class="post-card">'
       + '<div class="post-header">'
       + '<span class="post-author">' + pAvatar + ' ' + pName + '</span>'
-      + boardTag
+      + boardTag + pinnedTag
       + '<span class="post-time">' + escapeHtml(p.time) + '</span>'
       + '</div>'
       + '<h3 class="post-title">' + renderMarkdown(p.title) + '</h3>'
       + '<div class="post-body">' + renderMarkdown(p.content) + '</div>'
       + '<div class="post-actions">'
+      + viewsTag
       + '<button class="btn-action" onclick="likePost(\'' + p.id + '\')">👍 ' + (p.likes || 0) + '</button>'
       + '<button class="btn-action" onclick="triggerReply(\'' + p.id + '\')">💬 ' + (p.comments || []).length + '</button>'
       + '<button class="btn-action" onclick="exportPostCard(\'' + p.id + '\')">📸</button>'
