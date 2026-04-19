@@ -1203,7 +1203,127 @@ function renderMarkdown(text) {
   html = html.replace(/\[([^\]]+?)[\uff1a:]([^\]]+)\]/g, '<span class="md-link">[$1: $2]</span>');
   html = html.replace(/\n/g, '<br>');
   html = html.replace(/@([^\s@,\uff0c\u3002\uff01!?\uff1f<]+)/g, '<span class="mention">@$1</span>');
+  // 术语释义高亮
+  if (typeof GLOSSARY !== 'undefined' && glossaryEnabled) {
+    html = applyGlossary(html);
+  }
   return html;
+}
+
+// ---------- 术语释义开关 ----------
+var glossaryEnabled = false;
+
+function toggleGlossary() {
+  glossaryEnabled = !glossaryEnabled;
+  var btn = document.getElementById('glossaryToggle');
+  if (btn) {
+    btn.classList.toggle('active', glossaryEnabled);
+    btn.title = glossaryEnabled ? '术语释义：开' : '术语释义：关';
+  }
+  renderPosts();
+}
+
+// ---------- 术语高亮逻辑 ----------
+function applyGlossary(html) {
+  // 按术语长度降序排列，确保长术语优先匹配
+  var terms = Object.keys(GLOSSARY).sort(function(a, b) { return b.length - a.length; });
+  // 用占位符避免重复替换
+  var placeholders = [];
+  terms.forEach(function(term) {
+    // 转义正则特殊字符
+    var escaped = term.replace(/([.*+?^${}()|[\]\\])/g, '\\$1');
+    // 匹配术语（简单边界：前后不是字母数字和连字符）
+    var regex = new RegExp('(^|[^\\w\\-])(' + escaped + ')([^\\w\\-]|$)', 'g');
+    html = html.replace(regex, function(match, pre, word, post) {
+      var idx = placeholders.length;
+      var tip = escapeHtml(GLOSSARY[term]);
+      placeholders.push(pre + '<span class="glossary-term" onclick="showGlossaryTip(this)" data-tip="' + tip + '">' + word + '</span>' + post);
+      return '%%GLOSS_' + idx + '%%';
+    });
+  });
+  // 还原占位符
+  placeholders.forEach(function(ph, i) {
+    html = html.replace('%%GLOSS_' + i + '%%', ph);
+  });
+  return html;
+}
+
+// ---------- 术语气泡提示 ----------
+function showGlossaryTip(el) {
+  // 移除已存在的气泡
+  var old = document.querySelector('.glossary-bubble');
+  if (old) old.remove();
+
+  var bubble = document.createElement('div');
+  bubble.className = 'glossary-bubble';
+  bubble.innerHTML = '<div class="glossary-bubble-term">' + el.textContent + '</div>'
+    + '<div class="glossary-bubble-def">' + el.getAttribute('data-tip') + '</div>';
+  document.body.appendChild(bubble);
+
+  // 定位
+  var rect = el.getBoundingClientRect();
+  var bw = 260;
+  var left = rect.left + rect.width / 2 - bw / 2;
+  if (left < 8) left = 8;
+  if (left + bw > window.innerWidth - 8) left = window.innerWidth - 8 - bw;
+  bubble.style.left = left + 'px';
+  bubble.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+  bubble.style.width = bw + 'px';
+
+  setTimeout(function() { bubble.classList.add('show'); }, 10);
+
+  // 点击其他地方关闭
+  function closeBubble(e) {
+    if (!bubble.contains(e.target) && e.target !== el) {
+      bubble.classList.remove('show');
+      setTimeout(function() { if (bubble.parentNode) bubble.remove(); }, 200);
+      document.removeEventListener('click', closeBubble);
+    }
+  }
+  setTimeout(function() { document.addEventListener('click', closeBubble); }, 50);
+}
+
+// ---------- 术语表面板 ----------
+function openGlossaryPanel() {
+  var overlay = document.getElementById('glossaryOverlay');
+  if (overlay) { overlay.style.display = 'flex'; return; }
+  overlay = document.createElement('div');
+  overlay.id = 'glossaryOverlay';
+  overlay.className = 'modal-overlay glossary-overlay';
+  var terms = Object.keys(GLOSSARY);
+  // 分类
+  var categories = {
+    '设备': ['LEAF', 'LEAF-P', 'LEAF-C', 'LEAF-S', 'LEAF-Ø', 'LEAF-EX', 'EX接口', 'EX-MOD', 'EX-LEAF', 'MIRA', 'MIRA-D', 'MIRA-C'],
+    '碎片': ['碎片', 'Shard', 'Class-I', 'Class-II', 'Class-III', 'Class-IV', 'Ex.系列', '碎片残留', '碎片兼容性'],
+    '机构与地点': ['STEM', 'CROWN', 'SEED', 'CROVET', 'AType', 'ATI', 'symbia', 'Folium', 'Altera', 'Tower A', 'Lab-E', 'Lab-W', 'Bunker'],
+    '记忆与天灾': ['连接图', '记忆医生', '记忆错连', '天灾', '天灾后遗症', 'IC程序'],
+    '其他': ['在存档名', 'M.', '八楼温度', '第三个按钮', 'PR']
+  };
+  var html = '<div class="glossary-panel">'
+    + '<div class="glossary-panel-header">'
+    + '<span>📖 STEM-IX 术语速查</span>'
+    + '<button class="btn-close" onclick="closeGlossaryPanel()">✕</button>'
+    + '</div>'
+    + '<div class="glossary-panel-note">C级可见 · 数据管理部维护 · 内容仅供参考</div>'
+    + '<div class="glossary-panel-body">';
+  Object.keys(categories).forEach(function(cat) {
+    html += '<div class="glossary-cat">' + cat + '</div>';
+    categories[cat].forEach(function(t) {
+      if (GLOSSARY[t]) {
+        html += '<div class="glossary-row"><span class="glossary-row-term">' + escapeHtml(t) + '</span><span class="glossary-row-def">' + escapeHtml(GLOSSARY[t]) + '</span></div>';
+      }
+    });
+  });
+  html += '</div></div>';
+  overlay.innerHTML = html;
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) closeGlossaryPanel(); });
+  document.body.appendChild(overlay);
+  setTimeout(function() { overlay.style.display = 'flex'; }, 10);
+}
+
+function closeGlossaryPanel() {
+  var overlay = document.getElementById('glossaryOverlay');
+  if (overlay) overlay.style.display = 'none';
 }
 
 // ---------- 工具函数 ----------
