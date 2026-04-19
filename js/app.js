@@ -1227,40 +1227,39 @@ function toggleGlossary() {
 function applyGlossary(html) {
   var terms = Object.keys(GLOSSARY).sort(function(a, b) { return b.length - a.length; });
   var placeholders = [];
-  // 先保护 HTML 标签不被误匹配
   var tagPH = [];
   html = html.replace(/<[^>]+>/g, function(tag) {
     var ti = tagPH.length;
     tagPH.push(tag);
-    return '\x00T' + ti + '\x00';
+    return "~~TAG" + ti + "~~";
   });
   terms.forEach(function(term) {
     var escaped = term.replace(/([.*+?^${}()|[\]\\])/g, '\\$1');
-    var hasChinese = /[\u4e00-\u9fff]/.test(term);
+    var hasCJK = /[一-鿿]/.test(term);
     var regex;
-    if (hasChinese) {
+    if (hasCJK) {
       regex = new RegExp(escaped, 'g');
     } else {
-      regex = new RegExp('(^|[^A-Za-z0-9\\u00C0-\\u024F\\-])(' + escaped + ')(?=[^A-Za-z0-9\\u00C0-\\u024F\\-]|$)', 'g');
+      regex = new RegExp('(^|[^A-Za-z0-9-])(' + escaped + ')(?=[^A-Za-z0-9-]|$)', 'g');
     }
     html = html.replace(regex, function() {
       var a = arguments;
       var idx = placeholders.length;
       var tip = escapeHtml(GLOSSARY[term]);
       var span = '<span class="glossary-term" onclick="showGlossaryTip(this)" data-tip="' + tip + '">';
-      if (hasChinese) {
+      if (hasCJK) {
         placeholders.push(span + a[0] + '</span>');
       } else {
         placeholders.push(a[1] + span + a[2] + '</span>');
       }
-      return '\x00G' + idx + '\x00';
+      return '~~GLOSS' + idx + '~~';
     });
   });
   placeholders.forEach(function(ph, i) {
-    html = html.replace('\x00G' + i + '\x00', ph);
+    html = html.replace('~~GLOSS' + i + '~~', ph);
   });
   tagPH.forEach(function(tag, i) {
-    html = html.replace('\x00T' + i + '\x00', tag);
+    html = html.replace('~~TAG' + i + '~~', tag);
   });
   return html;
 }

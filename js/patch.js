@@ -31,6 +31,9 @@ renderMarkdown = function(text) {
   html = html.replace(/\[([^\]]+?)[:\uff1a]([^\]]+)\]/g, '<span class="md-link">[$1: $2]</span>');
   html = html.replace(/\n/g, '<br>');
   html = html.replace(/@([^\s@,\uff0c\u3002!?\uff01\uff1f<]+)/g, '<span class="mention">@$1</span>');
+  if (typeof GLOSSARY !== 'undefined' && glossaryEnabled) {
+    html = applyGlossary(html);
+  }
   return html;
 };
 
