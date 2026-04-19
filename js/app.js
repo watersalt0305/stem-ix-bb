@@ -1225,25 +1225,42 @@ function toggleGlossary() {
 
 // ---------- 术语高亮逻辑 ----------
 function applyGlossary(html) {
-  // 按术语长度降序排列，确保长术语优先匹配
   var terms = Object.keys(GLOSSARY).sort(function(a, b) { return b.length - a.length; });
-  // 用占位符避免重复替换
   var placeholders = [];
+  // 先保护 HTML 标签不被误匹配
+  var tagPH = [];
+  html = html.replace(/<[^>]+>/g, function(tag) {
+    var ti = tagPH.length;
+    tagPH.push(tag);
+    return '\x00T' + ti + '\x00';
+  });
   terms.forEach(function(term) {
-    // 转义正则特殊字符
     var escaped = term.replace(/([.*+?^${}()|[\]\\])/g, '\\$1');
-    // 匹配术语（简单边界：前后不是字母数字和连字符）
-    var regex = new RegExp('(^|[^\\w\\-])(' + escaped + ')([^\\w\\-]|$)', 'g');
-    html = html.replace(regex, function(match, pre, word, post) {
+    var hasChinese = /[\u4e00-\u9fff]/.test(term);
+    var regex;
+    if (hasChinese) {
+      regex = new RegExp(escaped, 'g');
+    } else {
+      regex = new RegExp('(^|[^A-Za-z0-9\\u00C0-\\u024F\\-])(' + escaped + ')(?=[^A-Za-z0-9\\u00C0-\\u024F\\-]|$)', 'g');
+    }
+    html = html.replace(regex, function() {
+      var a = arguments;
       var idx = placeholders.length;
       var tip = escapeHtml(GLOSSARY[term]);
-      placeholders.push(pre + '<span class="glossary-term" onclick="showGlossaryTip(this)" data-tip="' + tip + '">' + word + '</span>' + post);
-      return '%%GLOSS_' + idx + '%%';
+      var span = '<span class="glossary-term" onclick="showGlossaryTip(this)" data-tip="' + tip + '">';
+      if (hasChinese) {
+        placeholders.push(span + a[0] + '</span>');
+      } else {
+        placeholders.push(a[1] + span + a[2] + '</span>');
+      }
+      return '\x00G' + idx + '\x00';
     });
   });
-  // 还原占位符
   placeholders.forEach(function(ph, i) {
-    html = html.replace('%%GLOSS_' + i + '%%', ph);
+    html = html.replace('\x00G' + i + '\x00', ph);
+  });
+  tagPH.forEach(function(tag, i) {
+    html = html.replace('\x00T' + i + '\x00', tag);
   });
   return html;
 }
