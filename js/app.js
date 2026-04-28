@@ -1211,7 +1211,7 @@ function renderMarkdown(text) {
 }
 
 // ---------- 术语释义开关 ----------
-var glossaryEnabled = false;
+var glossaryEnabled = true;
 
 function toggleGlossary() {
   glossaryEnabled = !glossaryEnabled;
