@@ -1,1 +1,1 @@
-probe
+<svg width="18"><path d="M12 6v14"/></svg>
