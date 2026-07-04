@@ -2,6 +2,10 @@
    ShardBB — 多主题论坛样式
    ============================================ */
 
+/* ---------- Webfont：霞鹜文楷屏幕版（正文氛围）+ JetBrains Mono（系统编号） ---------- */
+@import url('https://fontsapi.zeoseven.com/292/main/result.css'); /* LXGW WenKai Screen */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
 /* ---------- 主题变量 ---------- */
 /* STEM-IX: 白底黑框复古BBS风 */
 [data-theme="terminal"] {
@@ -18,7 +22,7 @@
   --input-bg: #ffffff;
   --tag-bg: #1a1a1a;
   --tag-text: #ffffff;
-  --font: 'Courier New', 'SF Mono', 'Noto Sans Mono', monospace;
+  --font: 'JetBrains Mono', 'Courier New', 'SF Mono', 'LXGW WenKai Screen', 'Noto Sans Mono', monospace;
   --radius: 0px;
   --border-w: 2px;
 }
@@ -38,7 +42,7 @@
   --input-bg: #f9f7f4;
   --tag-bg: #e8ebe3;
   --tag-text: #5c6b4f;
-  --font: 'Georgia', 'Noto Serif SC', serif;
+  --font: 'Georgia', 'LXGW WenKai Screen', 'Noto Serif SC', serif;
   --radius: 6px;
   --border-w: 1px;
 }
@@ -58,7 +62,7 @@
   --input-bg: #111827;
   --tag-bg: #2a2315;
   --tag-text: #f59e0b;
-  --font: -apple-system, 'Segoe UI', sans-serif;
+  --font: 'LXGW WenKai Screen', -apple-system, 'Segoe UI', sans-serif;
   --radius: 6px;
   --border-w: 1px;
 }
@@ -1086,6 +1090,13 @@ select.form-input { cursor: pointer; }
 .ach-item.done { border-color: #ffd700; background: rgba(255,215,0,0.08); }
 .ach-item.locked { opacity: 0.5; }
 .ach-item-icon { font-size: 24px; flex-shrink: 0; }
+/* 成就SVG图标跟随主题色 */
+.ach-item-icon svg { color: var(--accent, #1a1a1a); display: block; }
+.ach-item.done .ach-item-icon svg { color: #c9a227; }
+.ach-item.locked .ach-item-icon svg { color: var(--text2, #888); }
+.ach-icon svg { color: #c9a227; display: block; }
+/* 帖子操作栏SVG与数字对齐 */
+.btn-action .sx-icon, .board-tag .sx-icon { vertical-align: -0.22em; }
 .ach-lock-img { width: 22px; height: 22px; object-fit: contain; opacity: 0.4; }
 .ach-item-title { font-size: 14px; font-weight: bold; color: var(--text, #222); min-width: 70px; }
 .ach-item-desc { font-size: 12px; color: var(--text2, #666); }
