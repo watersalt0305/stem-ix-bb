@@ -604,6 +604,12 @@ function userReply(postId) {
   }
 }
 
+// ---------- UI图标渲染辅助（emoji兜底） ----------
+function uiIcon(name, size) {
+  if (typeof ICONS !== 'undefined' && ICONS.has(name)) return ICONS.get(name, size || 15);
+  return '';
+}
+
 // ---------- 帖子/评论头像渲染辅助 ----------
 function renderPostAvatar(emoji, avatarImage, sizeClass) {
   if (avatarImage) {
@@ -663,10 +669,10 @@ function renderPosts() {
         + '</div>';
     }).join('');
 
-    var pAvatar = isAnon ? '🎭' : renderPostAvatar(p.emoji, p.avatarImage, 'avatar-inline');
+    var pAvatar = isAnon ? uiIcon('mask') : renderPostAvatar(p.emoji, p.avatarImage, 'avatar-inline');
     var pName = isAnon ? '匿名' : '@' + escapeHtml(p.author);
-    var pinnedTag = p.pinned ? '<span class="board-tag" style="background:#e74c3c;color:#fff">📌 置顶</span>' : '';
-    var viewsTag = p.views ? '<span class="btn-action" style="cursor:default">👁️ ' + p.views + '</span>' : '';
+    var pinnedTag = p.pinned ? '<span class="board-tag" style="background:#e74c3c;color:#fff">' + uiIcon('pin') + ' 置顶</span>' : '';
+    var viewsTag = p.views ? '<span class="btn-action" style="cursor:default">' + uiIcon('eye') + ' ' + p.views + '</span>' : '';
     return '<article class="post-card">'
       + '<div class="post-header">'
       + '<span class="post-author">' + pAvatar + ' ' + pName + '</span>'
@@ -677,10 +683,10 @@ function renderPosts() {
       + '<div class="post-body">' + renderMarkdown(p.content) + '</div>'
       + '<div class="post-actions">'
       + viewsTag
-      + '<button class="btn-action" onclick="likePost(\'' + p.id + '\')">👍 ' + (p.likes || 0) + '</button>'
-      + '<button class="btn-action" onclick="triggerReply(\'' + p.id + '\')">💬 ' + (p.comments || []).length + '</button>'
-      + '<button class="btn-action" onclick="exportPostCard(\'' + p.id + '\')">📸</button>'
-      + '<button class="btn-action" onclick="deletePost(\'' + p.id + '\')">🗑️</button>'
+      + '<button class="btn-action" onclick="likePost(\'' + p.id + '\')">' + uiIcon('thumb') + ' ' + (p.likes || 0) + '</button>'
+      + '<button class="btn-action" onclick="triggerReply(\'' + p.id + '\')">' + uiIcon('chat') + ' ' + (p.comments || []).length + '</button>'
+      + '<button class="btn-action" onclick="exportPostCard(\'' + p.id + '\')">' + uiIcon('download') + '</button>'
+      + '<button class="btn-action" onclick="deletePost(\'' + p.id + '\')">' + uiIcon('trash') + '</button>'
       + '</div>'
       + '<div class="comments-section">' + comments + '</div>'
       + '<div class="reply-box">'
