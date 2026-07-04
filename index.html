@@ -21,12 +21,12 @@
     <div class="header-actions">
       <button class="btn-icon user-btn" onclick="openProfile()" title="我的资料" id="userBtn"></button>
       <span class="post-count-badge" id="postCount">0 帖</span>
-      <button class="btn-icon glossary-btn" id="glossaryToggle" onclick="toggleGlossary()" title="术语释义：关">📖</button>
-      <button class="btn-icon glossary-list-btn" onclick="openGlossaryPanel()" title="术语速查表">☰</button>
-      <button class="btn-icon" id="charBtn" onclick="openCharacters()" title="角色管理" style="display:none">👥</button>
-<button class="btn-icon" onclick="showAchievementPanel()" title="成就&角色卡">✦</button>
-<button class="btn-icon" onclick="openSettings()" title="全局API设置">⚙</button>
-<button class="btn-icon" onclick="openAdmin()" title="管理员">⊕</button>
+      <button class="btn-icon glossary-btn" id="glossaryToggle" onclick="toggleGlossary()" title="术语释义：关" data-icon="book"></button>
+      <button class="btn-icon glossary-list-btn" onclick="openGlossaryPanel()" title="术语速查表" data-icon="list"></button>
+      <button class="btn-icon" id="charBtn" onclick="openCharacters()" title="角色管理" style="display:none" data-icon="users"></button>
+<button class="btn-icon" onclick="showAchievementPanel()" title="成就&角色卡" data-icon="spark"></button>
+<button class="btn-icon" onclick="openSettings()" title="全局API设置" data-icon="gear"></button>
+<button class="btn-icon" onclick="openAdmin()" title="管理员" data-icon="admin"></button>
     </div>
   </header>
 
@@ -36,8 +36,8 @@
   <!-- 发帖区 -->
   <section class="composer">
     <div class="composer-tabs">
-<button class="tab-btn active" data-tab="user" onclick="switchTab('user')">✎ 我来发帖</button>
-<button class="tab-btn" data-tab="ai" onclick="switchTab('ai')">◈ 让角色发帖</button>
+<button class="tab-btn active" data-tab="user" onclick="switchTab('user')"><span data-icon="pen" data-icon-size="14"></span> 我来发帖</button>
+<button class="tab-btn" data-tab="ai" onclick="switchTab('ai')"><span data-icon="diamond" data-icon-size="14"></span> 让角色发帖</button>
     </div>
 
     <div class="form-row">
@@ -65,7 +65,7 @@
         <textarea class="form-input" id="aiTopic" placeholder="留空则随机选话题…" maxlength="200"></textarea>
       </div>
       <div class="composer-footer">
-        <button class="btn-post" onclick="aiPost()">✨ 随机角色发帖</button>
+        <button class="btn-post" onclick="aiPost()"><span data-icon="sparkles" data-icon-size="14"></span> 随机角色发帖</button>
       </div>
     </div>
   </section>
@@ -84,14 +84,14 @@
     <div class="modal loading-card">
       <div class="loading-spinner"></div>
       <p class="loading-text">处理中…</p>
-      <p class="loading-sub" id="loadingSub">请稍候 ✨</p>
+      <p class="loading-sub" id="loadingSub">请稍候…</p>
     </div>
   </div>
 
   <!-- 全局API设置 -->
   <div class="overlay" id="settingsOverlay" onclick="if(event.target===this)closeSettings()">
     <div class="modal">
-      <h3>⚙️ 全局API设置</h3>
+      <h3><span data-icon="gear" data-icon-size="16"></span> 全局API设置</h3>
       <div class="form-row">
         <label>协议类型</label>
         <select class="form-input" id="cfgType">
@@ -112,7 +112,7 @@
         <label>模型</label>
         <div style="display:flex;gap:6px;align-items:center">
           <select class="form-input" id="cfgModel" style="flex:1"><option value="">-- 手动输入或拉取 --</option></select>
-          <button class="btn-post" style="padding:8px 12px;font-size:12px;white-space:nowrap" onclick="fetchModels()">📡 拉取</button>
+          <button class="btn-post" style="padding:8px 12px;font-size:12px;white-space:nowrap" onclick="fetchModels()"><span data-icon="antenna" data-icon-size="13"></span> 拉取</button>
         </div>
 <input class="form-input" id="cfgModelManual" placeholder="或手动输入模型名…" style="margin-top:6px">
         </div>
@@ -126,17 +126,17 @@
         <button class="btn-post btn-cancel" onclick="closeSettings()">取消</button>
         <button class="btn-post" onclick="saveSettingsForm()">保存</button>
       </div>
-      <p class="hint">💡 角色可设置独立API，不填则使用此全局配置。无API时使用预设Mock回复。</p>
+      <p class="hint"><span data-icon="bulb" data-icon-size="13"></span> 角色可设置独立API，不填则使用此全局配置。无API时使用预设Mock回复。</p>
     </div>
   </div>
 
   <!-- 角色管理 -->
   <div class="overlay" id="charsOverlay" onclick="if(event.target===this)closeCharacters()">
     <div class="modal modal-wide">
-      <h3>👥 角色管理</h3>
+      <h3><span data-icon="users" data-icon-size="16"></span> 角色管理</h3>
       <div id="charList"></div>
       <div class="composer-footer">
-        <button class="btn-post" onclick="editChar(null)">➕ 新建角色</button>
+        <button class="btn-post" onclick="editChar(null)"><span data-icon="plus" data-icon-size="13"></span> 新建角色</button>
         <button class="btn-post btn-cancel" onclick="closeCharacters()">关闭</button>
       </div>
     </div>
@@ -145,7 +145,7 @@
   <!-- 角色编辑 -->
   <div class="overlay" id="charEditOverlay" data-char-id="">
     <div class="modal modal-wide">
-      <h3>📝 编辑角色</h3>
+      <h3><span data-icon="edit" data-icon-size="16"></span> 编辑角色</h3>
       <div id="charEditContent"></div>
       <div class="composer-footer">
         <button class="btn-post btn-cancel" onclick="document.getElementById('charEditOverlay').classList.remove('show')">取消</button>
@@ -157,7 +157,7 @@
   <!-- 头像裁剪 -->
   <div class="overlay" id="cropOverlay">
     <div class="modal">
-      <h3>✂️ 裁剪头像</h3>
+      <h3><span data-icon="scissors" data-icon-size="16"></span> 裁剪头像</h3>
       <div class="crop-container">
         <canvas id="cropCanvas" width="256" height="256"></canvas>
       </div>
@@ -183,12 +183,12 @@
   <!-- 用户资料 -->
   <div class="overlay" id="profileOverlay" onclick="if(event.target===this)closeProfile()">
     <div class="modal">
-      <h3>👤 我的资料</h3>
+      <h3><span data-icon="user" data-icon-size="16"></span> 我的资料</h3>
       <div class="profile-avatar-section">
         <div class="profile-avatar" id="profileAvatarPreview"></div>
         <div class="profile-avatar-actions">
-          <button class="btn-sm" onclick="randomizeAvatar()">🎲 随机头像</button>
-          <label class="btn-sm" style="cursor:pointer">📷 上传头像 <input type="file" accept="image/*" onchange="uploadAvatar(event)" style="display:none"></label>
+          <button class="btn-sm" onclick="randomizeAvatar()"><span data-icon="dice" data-icon-size="13"></span> 随机头像</button>
+          <label class="btn-sm" style="cursor:pointer"><span data-icon="camera" data-icon-size="13"></span> 上传头像 <input type="file" accept="image/*" onchange="uploadAvatar(event)" style="display:none"></label>
         </div>
       </div>
       <div class="form-row">
@@ -212,7 +212,7 @@
   <!-- 管理员面板 -->
   <div class="overlay" id="adminOverlay" onclick="if(event.target===this)closeAdmin()">
     <div class="modal modal-wide">
-      <h3>🔐 管理员面板</h3>
+      <h3><span data-icon="lock" data-icon-size="16"></span> 管理员面板</h3>
       <div id="adminContent"></div>
     </div>
   </div>
@@ -231,6 +231,7 @@
 
   <div class="toast-container" id="toastContainer"></div>
 
+<script src="js/icons.js"></script>
 <script src="js/data.js"></script>
 <script src="js/api.js"></script>
 <script src="js/app.js"></script>
