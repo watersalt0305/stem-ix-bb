@@ -123,6 +123,13 @@ body {
   padding: 3px 8px;
   border-radius: 10px;
 }
+/* 内联SVG图标通用样式 */
+.sx-icon {
+  vertical-align: -0.18em;
+  display: inline-block;
+}
+.btn-icon .sx-icon { vertical-align: middle; }
+
 .btn-icon {
   background: none;
   border: none;
