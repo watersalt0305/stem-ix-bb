@@ -1037,24 +1037,27 @@ select.form-input { cursor: pointer; }
   top: 16px;
   left: 50%;
   transform: translateX(-50%) translateY(-100px);
-  background: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
-  color: #333;
+  background: var(--card, #fff);
+  color: var(--text, #222);
   padding: 12px 20px;
-  border-radius: 12px;
+  border: var(--border-w, 1px) solid var(--border, #222);
+  border-left: 4px solid #c9a227;
+  border-radius: var(--radius, 6px);
+  font-family: var(--font, inherit);
   display: flex;
   align-items: center;
   gap: 12px;
   z-index: 10000;
-  box-shadow: 0 4px 20px rgba(255,215,0,0.4);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
   transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   max-width: 90vw;
 }
 .achievement-popup.show { transform: translateX(-50%) translateY(0); }
 .ach-icon { font-size: 32px; }
 .ach-info { text-align: left; }
-.ach-title { font-size: 11px; font-weight: bold; opacity: 0.8; }
-.ach-name { font-size: 16px; font-weight: bold; margin: 2px 0; }
-.ach-desc { font-size: 12px; opacity: 0.7; }
+.ach-title { font-size: 11px; font-weight: bold; letter-spacing: 0.08em; color: #c9a227; }
+.ach-name { font-size: 16px; font-weight: bold; margin: 2px 0; color: var(--text, #222); }
+.ach-desc { font-size: 12px; color: var(--text2, #666); }
 
 /* ---------- 成就面板 ---------- */
 .achievement-panel {
