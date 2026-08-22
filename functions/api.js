@@ -25,9 +25,43 @@ export async function onRequest(context) {
     'Access-Control-Allow-Headers': '*'
   };
 
+  // ---------- 转发目标白名单（要加新中转站在这里添域名） ----------
+  var ALLOWED_TARGET_HOSTS = [
+    'zenmux.ai',
+    'api.openai.com',
+    'api.anthropic.com',
+    'openrouter.ai',
+    'api.deepseek.com',
+    'api.moonshot.cn',
+    'generativelanguage.googleapis.com'
+  ];
+
+  function hostAllowed(urlStr) {
+    try {
+      var h = new URL(urlStr).hostname;
+      return ALLOWED_TARGET_HOSTS.some(function (d) {
+        return h === d || h.endsWith('.' + d);
+      });
+    } catch (e) { return false; }
+  }
+
   try {
     if (request.method !== 'POST') {
       return new Response(JSON.stringify({ok: true, mode: 'shardbb-pages-proxy'}), {
+        headers: Object.assign({'Content-Type': 'application/json'}, corsHeaders)
+      });
+    }
+
+    // ---------- 来源校验：只放行从本站页面发起的请求 ----------
+    // 原理：浏览器发同站请求时 Origin/Referer 的 host 必等于当前站点 host，
+    // 换自定义域名也无需改代码；curl/脚本直连没有这俩头，直接挡掉。
+    var selfHost = new URL(request.url).hostname;
+    var srcHeader = request.headers.get('Origin') || request.headers.get('Referer') || '';
+    var srcHost = '';
+    try { srcHost = new URL(srcHeader).hostname; } catch (e) {}
+    if (srcHost !== selfHost) {
+      return new Response(JSON.stringify({error: 'forbidden: bad origin'}), {
+        status: 403,
         headers: Object.assign({'Content-Type': 'application/json'}, corsHeaders)
       });
     }
@@ -37,6 +71,12 @@ export async function onRequest(context) {
     var apiKey;
 
     if (targetUrl) {
+      if (!hostAllowed(targetUrl)) {
+        return new Response(JSON.stringify({error: 'forbidden: target host not in whitelist'}), {
+          status: 403,
+          headers: Object.assign({'Content-Type': 'application/json'}, corsHeaders)
+        });
+      }
       apiKey = request.headers.get('Authorization') || '';
       if (targetUrl.indexOf('/chat/completions') < 0) {
         if (!/\/v1\/?$/.test(targetUrl)) targetUrl += '/v1';
