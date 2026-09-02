@@ -612,11 +612,8 @@ function uiIcon(name, size) {
 
 // ---------- 帖子/评论头像渲染辅助 ----------
 function renderPostAvatar(emoji, avatarImage, sizeClass) {
-  if (avatarImage) {
-    var cls = sizeClass || 'avatar-inline';
-    return '<img class="' + cls + '" src="' + escapeHtml(avatarImage) + '" alt="">';
-  }
-  return escapeHtml(emoji || '👤');
+  // 帖子/评论不显示头像，只显示名字（头像仅用于角色卡与个人资料）
+  return '';
 }
 
 // ---------- 渲染帖子 ----------
@@ -1204,11 +1201,18 @@ function renderMarkdown(text) {
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
   html = html.replace(/~~(.+?)~~/g, '<del>$1</del>');
-  html = html.replace(/(^|\n)&gt; ?([^\n]*)/g, '$1<blockquote class="md-quote">$2</blockquote>');
-  html = html.replace(/(^|\n)\s*[-\u2013\u2014] +([^\n]+)/g, '$1<li class="md-li">$2</li>');
-  html = html.replace(/\[([^\]]+?)[\uff1a:]([^\]]+)\]/g, '<span class="md-link">[$1: $2]</span>');
+  var lines = html.split('\n');
+  for (var i = 0; i < lines.length; i++) {
+    if (/^&gt;\s?/.test(lines[i])) {
+      lines[i] = '<blockquote class="md-quote">' + lines[i].replace(/^&gt;\s?/, '') + '</blockquote>';
+    } else if (/^\s*-\s+/.test(lines[i])) {
+      lines[i] = '<li class="md-li">' + lines[i].replace(/^\s*-\s+/, '') + '</li>';
+    }
+  }
+  html = lines.join('\n');
+  html = html.replace(/\[([^\]]+?)[:\uff1a]([^\]]+)\]/g, '<span class="md-link">[$1: $2]</span>');
   html = html.replace(/\n/g, '<br>');
-  html = html.replace(/@([^\s@,\uff0c\u3002\uff01!?\uff1f<]+)/g, '<span class="mention">@$1</span>');
+  html = html.replace(/@([^\s@,\uff0c\u3002!?\uff01\uff1f<]+)/g, '<span class="mention">@$1</span>');
   // 术语释义高亮
   if (typeof GLOSSARY !== 'undefined' && glossaryEnabled) {
     html = applyGlossary(html);
