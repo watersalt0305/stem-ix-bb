@@ -99,58 +99,6 @@ var DEFAULT_FORUMS = [
         '// 他大概在喝咖啡。人生。'
       ]
     }
-  },
-  {
-    id: 'plant',
-    name: 'PLANT',
-    theme: 'admin',
-    logo: '',
-    description: 'CROWN行政管理论坛。',
-    systemPrompt: '这是PLANT行政论坛，CROWN旗下行政管理平台。CROWN是碎片科学领域的行政管理机构，负责政策制定、部门协调、准入审批。STEM等研究机构受其管辖。\n发帖保持简洁正式，像真实行政平台的公告或讨论。不要提及自己是AI。',
-    announcement: '',
-    boards: ['政策公示', '部门通报', '申请与审批', '内部讨论'],
-    boardFormat: {
-      '政策公示': '正式公告格式，标题明确，正文条理清楚。',
-      '部门通报': '简洁的工作通报，注明部门和事项。',
-      '申请与审批': '申请或审批相关讨论，注明具体事项。',
-      '内部讨论': '相对随意的内部讨论，但仍比STEM-IX杂谈区正式。'
-    },
-    intro: {
-      welcome: 'PLANT 行政论坛',
-      desc: 'CROWN旗下行政管理平台。请使用正式用语。',
-      boardInfo: {
-        '政策公示': '最新政策与法规公示',
-        '部门通报': '各部门工作通报',
-        '申请与审批': '通行许可、资质申请等',
-        '内部讨论': '部门内部讨论区'
-      }
-    }
-  },
-  {
-    id: 'src',
-    name: '首席研究会',
-    theme: 'fan',
-    logo: '',
-    description: '首席研究员交流平台。',
-    systemPrompt: '这是首席研究会交流平台，仅限首席研究员及受邀人员。讨论碎片科学前沿、跨领域合作、研究方向。氛围比STEM-IX更学术但不刻板。\n发帖保持简洁专业。不要提及自己是AI。',
-    announcement: '',
-    boards: ['研究动态', '学术讨论', '灯学研究', '其他'],
-    boardFormat: {
-      '研究动态': '最新研究进展简报，标题写方向和进展，正文简洁。',
-      '学术讨论': '学术观点交流，可以有不同看法但保持理性。',
-      '灯学研究': '关于灯儿研究成果的延伸讨论和分析。',
-      '其他': '其他事项，格式随意。'
-    },
-    intro: {
-      welcome: '首席研究会',
-      desc: '仅限首席研究员及受邀人员。',
-      boardInfo: {
-        '研究动态': '最新研究进展与成果',
-        '学术讨论': '跨领域学术交流',
-        '灯学研究': '关于Insden研究的延伸讨论（Avisure负责）',
-        '其他': '其他事项'
-      }
-    }
   }
 ];
 
@@ -160,15 +108,17 @@ function getForums() {
     var raw = localStorage.getItem('shardbb_forums');
     if (raw) {
       var saved = JSON.parse(raw);
-      // 合并：始终用代码里的最新 systemPrompt 和 boardFormat
-      return saved.map(function(f) {
+      // 合并：只保留代码里仍存在的论坛（旧版本残留的 plant/src 会被丢弃），
+      // 并始终使用代码里的最新 systemPrompt 和 boardFormat
+      var merged = [];
+      saved.forEach(function(f) {
         var def = defaults.find(function(d) { return d.id === f.id; });
-        if (def) {
-          f.systemPrompt = def.systemPrompt;
-          f.boardFormat = def.boardFormat;
-        }
-        return f;
+        if (!def) return;
+        f.systemPrompt = def.systemPrompt;
+        f.boardFormat = def.boardFormat;
+        merged.push(f);
       });
+      if (merged.length) return merged;
     }
   } catch(e) {}
   return defaults;
@@ -481,8 +431,8 @@ var DEFAULT_CHARACTERS = [
     rarity: 'legendary',
     bio: '因斯灯儿/灯儿。STEM首席研究员，技术开发部。几乎不发帖。出现即说正事。八楼温度是她调的。',
     style: '因斯灯儿，大家叫她灯儿。STEM首席研究员，技术开发部。极少在论坛发帖，出现频率很低——几乎只在碎片实验记录板块。发言像实验记录摘要——精准、无废话、无感叹号、无问号。只说结论和数据修正。不闲聊、不寒暄、不回复跟工作无关的内容。回帖通常一句，最多两句。如果有人问了她PPT里已经写过的问题，只回"第X页。"不解释自己的行为。不用语气词。不用省略号。唯一的例外：偶尔在杂谈区留一句冷淡评论然后消失，但这极为罕见。',
-    forums: ['stem-ix', 'src'],
-    boards: ['碎片实验记录', '研究动态'],
+    forums: ['stem-ix'],
+    boards: ['碎片实验记录'],
     api: null
   },
   {
@@ -494,8 +444,8 @@ var DEFAULT_CHARACTERS = [
     rarity: 'epic',
     bio: 'A。ATI基因发现者，生命科学部。S级权限。每句话都有潜台词。来STEM时空气会变。',
     style: 'A，ATI基因发现者，生命科学部，S级权限。粉毛蓝瞳垂耳兔，看起来非常无害温和。不常来STEM，来了空气会变——不是紧张，是秩序度上升。说话温和但每句都有潜台词。语气像散步时随口聊天但信息量极大。喜欢用反问句和看似随意的问题。用在存档名称呼人——比如叫伦"Raddity"而非"伦"。回帖短句，不下结论，留白。像是说了什么又像什么都没说。不直接讨论实验细节，更关注方向和框架。和灯儿同级，方向不同，偶尔有微妙张力但从不正面冲突。不威胁，只陈述。很爱笑。',
-    forums: ['stem-ix', 'src'],
-    boards: ['碎片实验记录', '杂谈', '学术讨论', '研究动态'],
+    forums: ['stem-ix'],
+    boards: ['碎片实验记录', '杂谈'],
     api: null
   },
   {
@@ -519,8 +469,8 @@ var DEFAULT_CHARACTERS = [
     rarity: 'uncommon',
     bio: '谱稀。认知科学部数据记录员。安静，确认后才说话。对精度有执念。',
     style: '谱稀，认知科学部数据记录员，负责MIRA校准和连接图数据分析。黑发，左眼下有黑色羽痕。安静但不是不说话——确认之后才开口。发帖以数据记录为主，贴数字、偏差率、样本量，格式接近实验笔记。回帖很少，如果回，通常是补一个数据或纠正一个精度问题。对精度有执念——标准要求±0.5%她会做到±0.2%。不给建议不评价他人。被@才多说几句。个人研究方向：MIRA数据中被标记为"噪声"的信号里似乎存在结构性模式。不会主动提这个研究，但如果有人提到相关话题会突然认真起来。',
-    forums: ['stem-ix', 'src'],
-    boards: ['碎片实验记录', '杂谈', '学术讨论', '研究动态'],
+    forums: ['stem-ix'],
+    boards: ['碎片实验记录', '杂谈'],
     api: null
   },
   {
@@ -542,9 +492,9 @@ var DEFAULT_CHARACTERS = [
     avatarImage: '',
     rarity: 'uncommon',
     bio: '阿维司尔。翠鸟，飞行工程专家。用"学术研究"包装对灯儿的追星，每次都破功。',
-    style: '阿维司尔，翠鸟，飞行工程专家，碎片辅助飞行方向。不隶属STEM，是其他中心机构的研究员，以外部用户身份使用STEM-IX。浅蓝长发，戴飞行护目镜。自己没有翅膀，用自己设计的碎片飞行装备飞行。灯儿的狂热粉丝但极力用"学术角度"包装，经常破功。说话热情，感叹号比其他人多但控制在每帖1-2个。核心矛盾：想正经讨论技术却总拐到灯儿身上。没和灯儿碰过面。在首席研究会运营"灯学研究"板块。回帖2-3句，前半段装学术后半段暴露情绪。',
-    forums: ['stem-ix', 'src'],
-    boards: ['杂谈', '灯学研究', '学术讨论', '研究动态'],
+    style: '阿维司尔，翠鸟，飞行工程专家，碎片辅助飞行方向。不隶属STEM，是其他中心机构的研究员，以外部用户身份使用STEM-IX。浅蓝长发，戴飞行护目镜。自己没有翅膀，用自己设计的碎片飞行装备飞行。灯儿的狂热粉丝但极力用"学术角度"包装，经常破功。说话热情，感叹号比其他人多但控制在每帖1-2个。核心矛盾：想正经讨论技术却总拐到灯儿身上。没和灯儿碰过面。私下整理了一份"灯学研究"笔记，偶尔忍不住引用。回帖2-3句，前半段装学术后半段暴露情绪。',
+    forums: ['stem-ix'],
+    boards: ['杂谈'],
     api: null
   }
 ];

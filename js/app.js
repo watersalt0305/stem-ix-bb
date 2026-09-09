@@ -4,26 +4,6 @@
 
 var currentPanel = 'none'; // none | settings | characters | forumEdit
 
-// ---------- 随机普通居民账号池 ----------
-var RANDOM_RESIDENT_POOL = [
-  // 命名风格：英文名/缩写+部门缩写
-  { name: 'MK_infra', emoji: '💻', dept: '信息基础设施部·系统维护', attitude: '对Insden：见过一次吓到了；对CielCa：找她修过bug；对Crovet：习以为常' },
-  { name: 'Lise.ENG', emoji: '🔧', dept: '设备工程部·LEAF质检员', attitude: '对Insden：敬畏，从没见过本人；对CielCa：依赖；对Crovet：被警告过' },
-  { name: 'T7_dat', emoji: '📊', dept: '数据处理室·日志分析', attitude: '对Insden：八卦，对CielCa：感谢，对外来访客：有点奇怪' },
-  { name: 'node_404', emoji: '🖥️', dept: '信息基础设施部·AI训练', attitude: '对Insden：好奇；对Crovet：怕它；对R_Observer：有点奇怪' },
-  { name: 'leaf_usr_18', emoji: '🍃', dept: '核心研究部·碎片校准', attitude: '对Insden：敬畏；对CielCa：习以为常；对Crovet：习以为常' },
-  { name: 'caffeine_needed', emoji: '☕', dept: '园区运维·设施技术员', attitude: '对Insden：从没见过本人；对CielCa：八卦；对Crovet：怕它' },
-  { name: '8F_too_cold', emoji: '🥶', dept: '核心研究部·实验助理', attitude: '对Insden：确定是她调的温度但不敢说；对CielCa：依赖；对Crovet：习以为常' },
-  { name: 'bell_stung_me', emoji: '🪼', dept: '外勤协调·采样员', attitude: '对BELL：创伤后遗症；对CielCa：感谢；对Insden：从未见过本人' },
-  { name: 'shard_resonance', emoji: '🔮', dept: '核心研究部·碎片校准', attitude: '对Insden：好奇，关注她的研究；对Aa：略微紧张；对Crovet：习以为常' },
-  { name: 'freq_analyst', emoji: '📡', dept: '数据处理室·日志分析', attitude: '对Insden：敬畏；对CielCa：依赖；对Crovet：习以为常' },
-  { name: 'lab6_east', emoji: '🧫', dept: '生命科学部·样本管理', attitude: '对Aa：紧张；对Insden：从未见过本人；对CielCa：依赖' },
-  { name: 'chip_tester_9', emoji: '⚡', dept: '设备工程部·芯片测试', attitude: '对Insden：敬畏；对CielCa：找她修过bug；对Crovet：被警告过' },
-  { name: 'symbia_watcher', emoji: '🌿', dept: '生命科学部·样本管理', attitude: '对Aa：仰慕；对Insden：好奇她对symbia实验的看法；对Crovet：习以为常' },
-  { name: 'old_timer_F6', emoji: '👴', dept: '园区运维·设施技术员', attitude: '对所有人：看淡一切，咖啡机第38次坏了也不惊讶' },
-  { name: 'intern_q', emoji: '😅', dept: '核心研究部·实验助理', attitude: '对Insden：非常害怕；对CielCa：唯一的依靠；对Crovet：第一次见到以为是普通人' },
-];
-
 // 主要角色（带权重）
 var MAIN_CHARS_WEIGHTED = [
   { weight: 0.08, id: 'cielca' },
@@ -119,23 +99,15 @@ function generateResidentAttitude() {
   return pickRandom(ATTITUDE_TEMPLATES);
 }
 
-var RANDOM_AVATAR_COUNT = 18; // img/random/1.png ~ 18.png
-
-function getRandomAvatar_resident() {
-  var n = Math.floor(Math.random() * RANDOM_AVATAR_COUNT) + 1;
-  return 'img/random/' + n + '.png';
-}
-
 function buildRandomResident() {
   var name = generateResidentName();
-  var avatarImg = getRandomAvatar_resident();
   var dept = pickRandom(DEPT_POOL);
   var attitude = generateResidentAttitude();
   return {
     id: 'resident_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
     name: name,
-    emoji: '👤',
-    avatarImage: avatarImg,
+    emoji: pickRandom(EMOJI_POOL),
+    avatarImage: '',
     style: '普通的STEM员工。岗位：' + dept + '。性格：' + attitude + '。说话接地气，像真实论坛用户。回帖简短1-2句。不了解核心研究机密。不要长篇大论。不要每次都提到主要人物的名字。',
     forums: [],
     boards: [],
@@ -147,12 +119,12 @@ function buildRandomResident() {
 // ---------- 初始化 ----------
 function init() {
   initUserBtn();
-  // 如果当前论坛是隐藏的，切回默认
+  // 旧版本 localStorage 里可能残留已删除的论坛 id，统一回落到默认论坛
+  var forums = getForums();
   var activeId = getActiveForum();
-  if ((activeId === 'src' || activeId === 'plant') && !isAdminUnlocked()) {
-    setActiveForum('stem-ix');
+  if (!forums.some(function(f) { return f.id === activeId; })) {
+    setActiveForum(forums[0].id);
   }
-  renderForumTabs();
   switchForum(getActiveForum());
   // 如果管理员已解锁，显示角色按钮
   if (isAdminUnlocked()) {
@@ -161,26 +133,7 @@ function init() {
   }
 }
 
-// ---------- 论坛切换 ----------
-function renderForumTabs() {
-  var forums = getForums();
-  var active = getActiveForum();
-  var isAdmin = _adminUnlocked === true;
-  var el = document.getElementById('forumTabs');
-  el.innerHTML = '';
-  for (var i = 0; i < forums.length; i++) {
-    var f = forums[i];
-    if (f.id === 'src' && !isAdmin) continue;
-    if (f.id === 'plant' && !isAdmin) continue;
-    var btn = document.createElement('button');
-    btn.className = 'forum-tab' + (f.id === active ? ' active' : '');
-    btn.textContent = f.name;
-    btn.setAttribute('data-fid', f.id);
-    btn.onclick = (function(fid) { return function() { switchForum(fid); }; })(f.id);
-    el.appendChild(btn);
-  }
-}
-
+// ---------- 论坛加载 ----------
 function switchForum(id) {
   setActiveForum(id);
   var forum = getForums().find(function(f) { return f.id === id; });
@@ -188,9 +141,6 @@ function switchForum(id) {
 
   // 重置板块过滤
   currentBoard = '';
-
-  // 更新标题
-  document.getElementById('forumTitle').textContent = forum.name;
 
   // 更新logo
   var logoEl = document.getElementById('forumLogo');
@@ -201,22 +151,9 @@ function switchForum(id) {
     logoEl.style.display = 'none';
   }
 
-  // 更新板块选择器
   renderBoardSelect(forum);
-
-  // 更新论坛首页信息
   renderForumInfo(forum);
-
-  // 更新帖子
   renderPosts();
-
-  // 更新tab样式
-  renderForumTabs();
-
-  // 切换主题
-  document.body.setAttribute('data-theme', forum.theme || 'terminal');
-
-  // 展示进场弹窗
   showWelcomePopup(forum);
 }
 
@@ -610,16 +547,8 @@ function uiIcon(name, size) {
   return '';
 }
 
-// ---------- 帖子/评论头像渲染辅助 ----------
-function renderPostAvatar(emoji, avatarImage, sizeClass) {
-  if (avatarImage) {
-    var cls = sizeClass || 'avatar-inline';
-    return '<img class="' + cls + '" src="' + escapeHtml(avatarImage) + '" alt="">';
-  }
-  return escapeHtml(emoji || '👤');
-}
-
 // ---------- 渲染帖子 ----------
+// 帖子/评论只显示名字，不显示头像；匿名投稿箱显示面具图标
 function renderPosts() {
   var forumId = getActiveForum();
   var allPosts = getPosts(forumId);
@@ -653,8 +582,7 @@ function renderPosts() {
     var boardTag = p.board ? '<span class="board-tag">' + escapeHtml(p.board) + '</span>' : '';
     var isAnon = p.board === '匿名投稿箱';
     var comments = (p.comments || []).map(function(c, ci) {
-      var cAvatar = isAnon ? '🎭' : renderPostAvatar(c.emoji, c.avatarImage, 'avatar-inline');
-      var cName = isAnon ? '匿名' : '@' + escapeHtml(c.author);
+      var cName = isAnon ? uiIcon('mask', 13) + ' 匿名' : '@' + escapeHtml(c.author);
       var replyTag = '';
       if (c.replyTo) {
         var rtName = isAnon ? '匿名' : escapeHtml(c.replyTo);
@@ -662,20 +590,19 @@ function renderPosts() {
       }
       var replyBtn = '<button class="btn-reply-inline" onclick="setReplyTarget(\'' + p.id + '\',' + ci + ')">回复</button>';
       return '<div class="comment">'
-        + '<span class="comment-author">' + cAvatar + ' ' + cName + '</span>'
+        + '<span class="comment-author">' + cName + '</span>'
         + '<span class="comment-time">' + escapeHtml(c.time) + '</span>'
         + replyBtn
         + '<div class="comment-text">' + replyTag + renderMarkdown(c.content || c.text || '') + '</div>'
         + '</div>';
     }).join('');
 
-    var pAvatar = isAnon ? uiIcon('mask') : renderPostAvatar(p.emoji, p.avatarImage, 'avatar-inline');
-    var pName = isAnon ? '匿名' : '@' + escapeHtml(p.author);
+    var pName = isAnon ? uiIcon('mask') + ' 匿名' : '@' + escapeHtml(p.author);
     var pinnedTag = p.pinned ? '<span class="board-tag" style="background:#e74c3c;color:#fff">' + uiIcon('pin') + ' 置顶</span>' : '';
     var viewsTag = p.views ? '<span class="btn-action" style="cursor:default">' + uiIcon('eye') + ' ' + p.views + '</span>' : '';
     return '<article class="post-card">'
       + '<div class="post-header">'
-      + '<span class="post-author">' + pAvatar + ' ' + pName + '</span>'
+      + '<span class="post-author">' + pName + '</span>'
       + boardTag + pinnedTag
       + '<span class="post-time">' + escapeHtml(p.time) + '</span>'
       + '</div>'
@@ -1204,11 +1131,19 @@ function renderMarkdown(text) {
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
   html = html.replace(/~~(.+?)~~/g, '<del>$1</del>');
-  html = html.replace(/(^|\n)&gt; ?([^\n]*)/g, '$1<blockquote class="md-quote">$2</blockquote>');
-  html = html.replace(/(^|\n)\s*[-\u2013\u2014] +([^\n]+)/g, '$1<li class="md-li">$2</li>');
-  html = html.replace(/\[([^\]]+?)[\uff1a:]([^\]]+)\]/g, '<span class="md-link">[$1: $2]</span>');
+  // 逐行处理引用和列表，避免正则跨行误匹配
+  var lines = html.split('\n');
+  for (var i = 0; i < lines.length; i++) {
+    if (/^&gt;\s?/.test(lines[i])) {
+      lines[i] = '<blockquote class="md-quote">' + lines[i].replace(/^&gt;\s?/, '') + '</blockquote>';
+    } else if (/^\s*-\s+/.test(lines[i])) {
+      lines[i] = '<li class="md-li">' + lines[i].replace(/^\s*-\s+/, '') + '</li>';
+    }
+  }
+  html = lines.join('\n');
+  html = html.replace(/\[([^\]]+?)[:\uff1a]([^\]]+)\]/g, '<span class="md-link">[$1: $2]</span>');
   html = html.replace(/\n/g, '<br>');
-  html = html.replace(/@([^\s@,\uff0c\u3002\uff01!?\uff1f<]+)/g, '<span class="mention">@$1</span>');
+  html = html.replace(/@([^\s@,\uff0c\u3002!?\uff01\uff1f<]+)/g, '<span class="mention">@$1</span>');
   // 术语释义高亮
   if (typeof GLOSSARY !== 'undefined' && glossaryEnabled) {
     html = applyGlossary(html);
@@ -1621,7 +1556,8 @@ function renderAdminPanel(el) {
     + '<div class="form-row">'
     + '<label>公告</label>'
     + '<textarea class="form-input" id="adminAnnouncement" rows="3">' + escapeHtml(forum.announcement || '') + '</textarea>'
-+ '<div class="admin-section" style="margin-top:14px">'
+    + '</div>'
+    + '<div class="admin-section" style="margin-top:14px">'
     + '<div class="info-label">👥 角色设定一览（' + chars.length + ' 个角色）</div>'
     + charPreviewHtml
     + '<div class="composer-footer" style="margin-top:8px">'
@@ -1630,17 +1566,11 @@ function renderAdminPanel(el) {
     + '</div>'
     + '</div>'
     + '<div class="admin-section" style="margin-top:14px">'
-    + '<div class="info-label">🎭 随机普通员工池（' + RANDOM_RESIDENT_POOL.length + ' 人）<button class="btn-sm" style="margin-left:8px" onclick="toggleResidentList()">展开/收起</button></div>'
+    + '<div class="info-label">🎭 随机普通员工生成器 <button class="btn-sm" style="margin-left:8px" onclick="toggleResidentList()">展开/收起</button></div>'
     + '<div id="residentListPreview" style="display:none">'
-    + RANDOM_RESIDENT_POOL.map(function(r) {
-        return '<div class="char-preview-item">'
-          + '<div class="char-preview-header">'
-          + '<span class="char-name">' + escapeHtml(r.emoji) + ' ' + escapeHtml(r.name) + '</span>'
-          + '<span class="char-meta">' + escapeHtml(r.dept) + '</span>'
-          + '</div>'
-          + '<div class="char-preview-style">' + escapeHtml(r.attitude) + '</div>'
-          + '</div>';
-      }).join('')
+    + '<div class="char-preview-item">'
+    + '<div class="char-preview-style">每次由 ' + NAME_PREFIXES.length + ' 个名字前缀 × ' + DEPT_POOL.length + ' 个岗位 × ' + ATTITUDE_TEMPLATES.length + ' 种性格模板随机组合生成，出场概率 ' + Math.round(RESIDENT_WEIGHT * 100) + '%。</div>'
+    + '<div class="char-preview-style" style="margin-top:6px">示例：' + [1,2,3].map(function() { var r = buildRandomResident(); return escapeHtml(r.emoji + ' ' + r.name); }).join('　') + '</div>'
     + '</div>'
     + '</div>'
     + '</div>'
