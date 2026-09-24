@@ -152,6 +152,7 @@ function switchForum(id) {
   }
 
   renderBoardSelect(forum);
+  if (typeof renderBannerBoards === 'function') renderBannerBoards(forum);
   renderForumInfo(forum);
   renderPosts();
   showWelcomePopup(forum);
@@ -193,21 +194,7 @@ function renderForumInfo(forum) {
     + '<div class="info-text">' + escapeHtml(info.desc || forum.description) + '</div>'
     + '</div>';
 
-  // 板块导航卡片
-  var boardsHtml = '';
-  if (forum.boards && forum.boards.length > 0) {
-    var cards = forum.boards.map(function(b) {
-      var desc = (info.boardInfo && info.boardInfo[b]) || '';
-      return '<div class="board-card" onclick="selectBoard(\'' + escapeAttr(b) + '\')">'
-        + '<div class="board-card-name">' + escapeHtml(b) + '</div>'
-        + '<div class="board-card-desc">' + escapeHtml(desc) + '</div>'
-        + '</div>';
-    }).join('');
-    boardsHtml = '<div class="info-block">'
-      + '<div class="info-label">板块</div>'
-      + '<div class="board-grid">' + cards + '</div>'
-      + '</div>';
-  }
+  // 板块导航已移到 banner 的元素格（js/banner.js），这里不再重复渲染
 
   // 彩蛋
   var easterHtml = '';
@@ -215,7 +202,7 @@ function renderForumInfo(forum) {
     easterHtml = '<div class="info-easter">' + escapeHtml(info.easter) + '</div>';
   }
 
-  el.innerHTML = announcementHtml + welcomeHtml + boardsHtml + easterHtml;
+  el.innerHTML = announcementHtml + welcomeHtml + easterHtml;
 }
 
 // 当前选中板块
@@ -236,10 +223,8 @@ function selectBoard(board) {
 }
 
 function updateBoardHighlight() {
-  var cards = document.querySelectorAll('.board-card');
-  cards.forEach(function(card) {
-    var name = card.querySelector('.board-card-name').textContent;
-    card.classList.toggle('active', name === currentBoard);
+  document.querySelectorAll('#ixBoards .el').forEach(function(el) {
+    el.classList.toggle('on', el.dataset.board === currentBoard);
   });
 }
 

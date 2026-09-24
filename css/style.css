@@ -8,7 +8,7 @@
    IBM Plex Mono：英文 / 代码 / 标签
    像素字体请用 12 的整数倍字号（12 / 24），否则会糊 */
 @import url('https://fontsapi.zeoseven.com/570/main/result.css');
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter+Tight:wght@300;800;900&display=swap');
 
 /* ---------- Design Tokens ---------- */
 :root {
@@ -123,60 +123,126 @@ img { display: block; max-width: 100%; }
 .btn-icon .sx-icon { vertical-align: middle; }
 .btn-action .sx-icon, .board-tag .sx-icon { vertical-align: -0.2em; }
 
-/* ---------- 顶栏 ---------- */
+/* ---------- CROVET 状态条 + Banner ----------
+   从 mock/c_banner 移植。状态条通栏（突破 body 的 680px），banner 在内容宽度内。
+   banner 局部 token 都挂在 .sys / .banner 上，不影响全局配色 */
+html { overflow-x: clip; }               /* 通栏状态条用 100vw，防横向滚动条 */
+
+.sys, .banner, .ix-notice {
+  --b-ink: #151514;                      /* banner 专用深墨色（全局 --ink 是柔和中灰） */
+  --b-ink2: #55554f;
+  --b-ink3: #9b9a92;
+  --b-sys: #e9e8e1;                      /* 状态条文字 */
+  --font-display: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.sys {
+  margin: 0 calc(50% - 50vw);
+  background: var(--b-ink);
+  color: var(--b-sys);
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  letter-spacing: .5px;
+  line-height: 28px;
+  height: 28px;
+  overflow: hidden;
+}
+.sys-inner {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 var(--sp-3);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  white-space: nowrap;
+}
+.sys .dot { width: 7px; height: 7px; background: var(--b-sys); display: inline-block; margin-right: 6px; animation: ix-blink 1.4s steps(1) infinite; }
+.sys .item { opacity: 0; transition: opacity .2s; }
+.sys .item.on { opacity: 1; }
+.sys .dim { color: #7d7c75; }
+.sys .ticker { margin-left: auto; color: #b9b8b0; overflow: hidden; text-overflow: clip; }
+.ix-cur { display: inline-block; width: .55em; height: 1em; background: currentColor; vertical-align: -2px; margin-left: 2px; animation: ix-blink 1s steps(1) infinite; }
+@keyframes ix-blink { 50% { opacity: 0; } }
+
+.banner {
+  position: relative;
+  overflow: hidden;
+  overflow: clip;                        /* clip 不是滚动容器，聚焦按钮时不会把 banner 内部滚走 */
+  padding: 36px 0 22px;
+  border-bottom: 1px solid var(--b-ink);
+  color: var(--b-ink);
+  line-height: 1.2;
+  -webkit-font-smoothing: antialiased;   /* 大字号细体需要抗锯齿；body 的 none 是给像素字的 */
+}
+.banner .wm {
+  position: absolute; right: -6px; bottom: -14px; width: 300px;
+  opacity: 0; transition: opacity 1.6s ease .3s; pointer-events: none;
+}
+.banner.ready .wm { opacity: .07; }
+
+/* 眉题行：STEM — + 板块元素格 */
+.eyerow { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 18px; margin-bottom: 10px; position: relative; }
+.eyebrow { font-family: var(--font-display); font-weight: 800; font-size: 40px; letter-spacing: 6px; line-height: 1; }
+.boards { display: flex; gap: 8px; }
+.el {
+  display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px 0 8px;
+  border: 1.5px solid var(--b-ink); background: var(--bg); color: var(--b-ink);
+  cursor: pointer; flex-shrink: 0; line-height: 1.25; text-align: left;
+  transition: transform .12s, box-shadow .12s; -webkit-tap-highlight-color: transparent;
+}
+.el .s { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -.5px; line-height: 1; min-width: 1.2em; }
+.el .meta { display: flex; flex-direction: column; }
+.el .n { font-family: var(--font-mono); font-size: 9.5px; color: var(--b-ink3); letter-spacing: .5px; }
+.el .nm { font-family: var(--font-pixel); font-size: 12px; color: var(--b-ink2); white-space: nowrap; }
+.el:hover { transform: translate(-2px, -2px); box-shadow: 3px 3px 0 var(--b-ink); }
+.el:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.el.on { background: var(--b-ink); color: var(--bg); }
+.el.on .n { color: #8a8982; }
+.el.on .nm { color: #d8d7cf; }
+
+/* 主标题 */
+.title { font-family: var(--font-display); font-weight: 300; font-size: 96px; line-height: 1; letter-spacing: -3px; position: relative; }
+.title .ch { display: inline-block; position: relative; transition: opacity .18s, transform .5s cubic-bezier(.2,.8,.2,1); }
+.title .k {
+  font-weight: 900; color: transparent; -webkit-text-stroke: 2.2px var(--b-ink);
+  transition: color .14s ease-out, opacity .18s, transform .6s cubic-bezier(.2,.8,.2,1);
+}
+.title .k.solid { color: var(--b-ink); }
+.title .ch.hide3 { opacity: 0; transform: translateX(-18px); }
+
+/* 副题行：元素徽章 + 系统回话 */
+.kicker {
+  font-family: var(--font-mono); font-size: 15px; letter-spacing: 3px; color: var(--b-ink2);
+  margin-top: 22px; position: relative; display: flex; align-items: center; min-height: 24px;
+}
+.badge {
+  display: inline-flex; gap: 8px; border: 1.5px solid var(--b-ink); font-size: 12px; padding: 1px 6px;
+  margin-right: 14px; letter-spacing: 1px; cursor: help; position: relative; background: var(--bg); flex-shrink: 0;
+}
+.badge b { font-weight: 500; }
+.badge:hover, .badge.on { background: var(--b-ink); color: var(--bg); }
+#kick.sysvoice { font-family: var(--font-pixel); font-size: 12px; letter-spacing: .5px; color: var(--b-ink); }
+
+/* CROVET 插话（彩蛋） */
+.ix-notice {
+  position: fixed; left: 50%; bottom: 24px; z-index: var(--z-toast);
+  transform: translate(-50%, 20px); background: var(--b-ink); color: var(--b-sys);
+  font-family: var(--font-pixel); font-size: 12px; padding: 10px 14px; max-width: 90vw;
+  opacity: 0; transition: .25s; pointer-events: none;
+}
+.ix-notice.show { opacity: 1; transform: translate(-50%, 0); }
+.ix-notice::before { content: 'CROVET-NOTICE'; background: var(--b-sys); color: var(--b-ink); padding: 0 5px; margin-right: 8px; }
+
+/* ---------- 工具栏（原顶栏，现在在 banner 下方） ---------- */
 .top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-4) 0 var(--sp-3);
+  padding: var(--sp-2) 0;
   border-bottom: var(--border-w) solid var(--border);
 }
-.top-left {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  min-width: 0;
-  flex: 1;
-}
-.forum-logo {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-  flex-shrink: 0;
-  image-rendering: pixelated;
-}
-.forum-subtitle { display: none; }
-
-.banner-title {
-  font-family: var(--font-pixel);
-  font-size: var(--fs-xl);
-  font-weight: 400;
-  line-height: 1;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--sp-2);
-}
-.banner-title .brand-stem {
-  color: var(--text);
-  letter-spacing: 1px;
-}
-.banner-title .brand-ix {
-  color: var(--text2);
-  font-size: var(--fs-xl);
-  letter-spacing: 0;
-}
-/* I / X 用反色块突出，组成 IX 视觉锚点 */
-.banner-title .highlight-lead {
-  display: inline-block;
-  background: var(--ink);
-  color: var(--ink-text);
-  padding: 0 4px;
-  margin: 0 1px;
-  line-height: 1;
-}
-
+.forum-logo { display: none; }           /* app.js 仍会写 src，保留节点但不显示 */
 .header-actions {
   display: flex;
   align-items: center;
@@ -354,38 +420,6 @@ select.form-input { cursor: pointer; }
   border-left: 2px dashed var(--text3);
   margin-bottom: var(--sp-2);
 }
-
-/* 板块卡片 */
-.board-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--sp-2);
-}
-.board-card {
-  background: var(--card);
-  border: var(--border-w) solid var(--border);
-  padding: 10px var(--sp-3);
-  cursor: pointer;
-  transition: transform 0.08s, box-shadow 0.08s;
-}
-.board-card:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow);
-}
-.board-card.active {
-  background: var(--ink);
-  color: var(--ink-text);
-}
-.board-card.active:hover { box-shadow: var(--shadow-ink); }
-.board-card-name { color: inherit; margin-bottom: 2px; }
-.board-card-name::before { content: '# '; opacity: 0.5; }
-.board-card-desc {
-  font-size: var(--fs-xs);
-  font-family: var(--font-mono);
-  color: var(--text2);
-  line-height: 1.5;
-}
-.board-card.active .board-card-desc { color: var(--ink-text); opacity: 0.7; }
 
 /* 过滤栏 */
 .filter-bar {
@@ -1155,21 +1189,32 @@ input[type="checkbox"] { accent-color: var(--ink); width: 14px; height: 14px; }
 }
 
 /* ---------- 响应式 ---------- */
+@media (max-width: 640px) {
+  .sys-inner { padding: 0 var(--sp-2); }
+  .sys .hide-m { display: none; }
+  .banner { padding: 24px 0 16px; }
+  .banner .wm { width: 150px; right: -4px; bottom: -8px; }
+  .eyerow { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .eyebrow { font-size: 16px; letter-spacing: 3px; }
+  .boards { width: 100%; overflow-x: auto; gap: 6px; scrollbar-width: none; padding: 2px 0 4px; }
+  .boards::-webkit-scrollbar { display: none; }
+  .el { height: 36px; padding: 0 8px; gap: 6px; }
+  .el .s { font-size: 16px; }
+  .el .nm { display: none; }
+  .el .n { font-size: 9px; }
+  .el:hover { transform: none; box-shadow: none; }
+  .title { font-size: 44px; letter-spacing: -1.5px; line-height: 1.02; }
+  .title .k { -webkit-text-stroke: 1.3px var(--b-ink); }
+  .kicker { font-size: 9px; letter-spacing: 1px; margin-top: 14px; flex-wrap: wrap; row-gap: 6px; }
+  .badge { font-size: 10px; padding: 0 5px; margin-right: 8px; border-width: 1px; }
+  #kick.sysvoice { font-size: 12px; }
+}
 @media (max-width: 520px) {
   body { padding: 0 var(--sp-2) 80px; }
-  .top-bar {
-    flex-wrap: wrap;
-    padding: var(--sp-3) 0 var(--sp-2);
-    gap: var(--sp-2);
-  }
-  .top-left { flex-basis: 100%; }
-  .banner-title { white-space: normal; flex-wrap: wrap; gap: var(--sp-1) var(--sp-2); }
-  .header-actions { width: 100%; justify-content: flex-end; }
-  .post-count-badge { margin-right: auto; }
+  .top-bar { gap: var(--sp-2); }
   .composer, .info-block, .post-card { padding: var(--sp-3); }
   .composer { box-shadow: none; }
   .post-title { font-size: 18px; }
-  .board-grid { grid-template-columns: 1fr; }
   .modal, .achievement-panel { padding: var(--sp-4); max-height: 92vh; }
   .modal h3 {
     margin: calc(-1 * var(--sp-4)) calc(-1 * var(--sp-4)) var(--sp-3);

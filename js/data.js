@@ -52,6 +52,15 @@ var GLOSSARY = {
 };
 
 // ---------- 论坛数据 ----------
+// banner 板块元素格：符号 / 发帖权限 / 悬停时 CROVET 的回话
+// 放在论坛对象外面，因为论坛对象会被 localStorage 缓存，新加字段老用户读不到
+var BOARD_META = {
+  '碎片实验记录': { sym: 'Sh', lv: 'B', say: '发帖权限 B' },
+  'EX-MOD':       { sym: 'Ex', lv: 'B', say: '小心烧接口' },
+  '杂谈':         { sym: 'Ch', lv: 'C', say: '日常、后勤、食堂' },
+  '匿名投稿箱':   { sym: 'An', lv: '?', say: '管理员可见发帖人' }
+};
+
 var DEFAULT_FORUMS = [
   {
     id: 'stem-ix',

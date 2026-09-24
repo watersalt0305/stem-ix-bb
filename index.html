@@ -6,20 +6,39 @@
   <meta name="description" content="STEM-IX · STEM Internal eXchange — AI 角色扮演内部论坛">
   <meta name="theme-color" content="#f5f5f0">
   <title>STEM-IX · ShardBB</title>
-  <link rel="stylesheet" href="css/style.css?v=103">
+  <link rel="stylesheet" href="css/style.css?v=104">
 </head>
 <body>
 
-  <!-- 顶栏 -->
-  <header class="top-bar">
-    <div class="top-left">
-      <img class="forum-logo" id="forumLogo" src="" alt="" style="display:none">
-      <h1 class="logo banner-title" id="forumTitle"><span class="brand-stem">STEM</span> <span class="brand-ix"><span class="highlight-lead">I</span>nternal e<span class="highlight-lead">X</span>change</span></h1>
-      <div class="forum-subtitle" id="forumSubtitle" style="display:none">STEM Internal eXchange</div>
+  <!-- CROVET 状态条（通栏） -->
+  <div class="sys" aria-hidden="true"><div class="sys-inner">
+    <span class="item" data-i="0"><span class="dot"></span>CROVET ONLINE</span>
+    <span class="item dim">NODE 06</span>
+    <span class="item dim">CLEARANCE C</span>
+    <span class="item dim hide-m" id="ixClock">--:--:--</span>
+    <span class="ticker hide-m"><span id="ixTick"></span><span class="ix-cur"></span></span>
+  </div></div>
+
+  <!-- Banner -->
+  <header class="banner" id="banner">
+    <img class="wm" id="ixWm" src="img/stem_logo.svg" alt="">
+    <div class="eyerow">
+      <div class="eyebrow">STEM —</div>
+      <nav class="boards" id="ixBoards" aria-label="板块"></nav>
     </div>
+    <h1 class="title" id="ixTitle" aria-label="STEM Internal eXchange"><span class="ch k">I</span>nternal<br>e<span class="ch k">X</span>change</h1>
+    <div class="kicker">
+      <span class="badge" id="ixBadge" role="button" tabindex="0"><span>09</span><b>IX</b><span>C-III</span></span>
+      <span id="kick"></span><span class="ix-cur" id="kcur"></span>
+    </div>
+  </header>
+
+  <!-- 工具栏 -->
+  <div class="top-bar">
+    <img class="forum-logo" id="forumLogo" src="" alt="">
+    <span class="post-count-badge" id="postCount">0 帖</span>
     <div class="header-actions">
       <button class="btn-icon user-btn" onclick="openProfile()" title="我的资料" id="userBtn"></button>
-      <span class="post-count-badge" id="postCount">0 帖</span>
       <button class="btn-icon glossary-btn" id="glossaryToggle" onclick="toggleGlossary()" title="术语释义：关" data-icon="book"></button>
       <button class="btn-icon glossary-list-btn" onclick="openGlossaryPanel()" title="术语速查表" data-icon="list"></button>
       <button class="btn-icon" id="charBtn" onclick="openCharacters()" title="角色管理" style="display:none" data-icon="users"></button>
@@ -27,7 +46,7 @@
       <button class="btn-icon" onclick="openSettings()" title="全局API设置" data-icon="gear"></button>
       <button class="btn-icon" onclick="openAdmin()" title="管理员" data-icon="admin"></button>
     </div>
-  </header>
+  </div>
 
   <!-- 发帖区 -->
   <section class="composer">
@@ -226,10 +245,12 @@
   </div>
 
   <div class="toast-container" id="toastContainer"></div>
+  <div class="ix-notice" id="ixNotice" role="status"></div>
 
 <script src="js/icons.js?v=100"></script>
-<script src="js/data.js?v=100"></script>
+<script src="js/data.js?v=101"></script>
 <script src="js/api.js?v=100"></script>
-<script src="js/app.js?v=100"></script>
+<script src="js/app.js?v=101"></script>
+<script src="js/banner.js?v=100"></script>
 </body>
 </html>
