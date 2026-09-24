@@ -1348,6 +1348,38 @@ input[type="checkbox"] { accent-color: var(--ink); width: 14px; height: 14px; }
 .compose-as b { color: var(--text); font-weight: 600; }
 .compose-hint { font-family: var(--font-mono); font-size: var(--fs-2xs); color: var(--text3); margin-top: var(--sp-2); }
 
+/* ---------- 弹窗统一：标题栏 = 系统之声 ---------- */
+.modal h3 {
+  background: var(--sys-bg);
+  color: var(--sys-text);
+  border-bottom-color: var(--sys-bg);
+  font-family: var(--font-pixel);
+  letter-spacing: .5px;
+}
+.modal h3::before { content: 'CROVET'; font-size: 10px; letter-spacing: 1px; padding: 0 5px; background: var(--sys-text); color: var(--sys-bg); }
+.modal h3 .sx-icon { color: var(--sys-mid); }
+.loading-card h3::before { content: none; }
+
+/* ---------- 工具类（替代 index.html 里的内联样式） ---------- */
+.field-note { font-family: var(--font-mono); font-size: 11px; color: var(--text2); margin-bottom: var(--sp-1); }
+.model-row { display: flex; gap: 6px; align-items: center; }
+.model-row .form-input { flex: 1; }
+.btn-compact { padding: 8px 12px; font-size: 12px; white-space: nowrap; }
+.mt-2 { margin-top: var(--sp-2); }
+.push-left { margin-right: auto; }
+.file-label { cursor: pointer; }
+.file-hidden { display: none; }
+
+/* ---------- 帖子流标题（帖数从工具栏挪到这里） ---------- */
+.feed-head {
+  display: flex; align-items: center; gap: var(--sp-2);
+  margin-top: var(--sp-5); padding-bottom: var(--sp-2);
+  border-bottom: var(--border-w) solid var(--border);
+  font-family: var(--font-pixel); font-size: 12px; letter-spacing: 1px; color: var(--text);
+}
+.feed-head .post-count-badge { margin-left: auto; }
+.feed-head + .feed { margin-top: var(--sp-3); }
+
 /* ---------- 响应式 ---------- */
 @media (max-width: 640px) {
   .sys-inner { padding: 0 var(--sp-2); }
@@ -1371,6 +1403,13 @@ input[type="checkbox"] { accent-color: var(--ink); width: 14px; height: 14px; }
 }
 @media (max-width: 520px) {
   body { padding: 0 var(--sp-2) 80px; }
+  .composer.open { padding: 0; }
+  .composer.open .composer-body { max-width: none; max-height: none; height: 100%; border: none; box-shadow: none; padding: 0 var(--sp-3) var(--sp-3); }
+  .composer.open .compose-head { margin: 0 calc(-1 * var(--sp-3)) var(--sp-3); padding-left: var(--sp-3); }
+  .compose-editor textarea { min-height: 40vh; }
+  .compose-grid { grid-template-columns: 44px 1fr; }
+  .compose-foot { flex-wrap: wrap; }
+  .compose-foot .btn-post { flex: 1; }
   .top-bar { gap: var(--sp-2); }
   .post-card { padding: var(--sp-3); }
   .composer-toggle { padding: var(--sp-3); }
