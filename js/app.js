@@ -179,30 +179,46 @@ function renderForumInfo(forum) {
   }
   var info = forum.intro;
 
-  // 公告
+  // 公告（系统之声）
   var announcementHtml = '';
   if (forum.announcement) {
     announcementHtml = '<div class="info-block announcement-block">'
-      + '<div class="info-label">📢 公告</div>'
-      + '<div class="info-text">' + escapeHtml(forum.announcement) + '</div>'
+      + '<span class="info-label">NOTICE</span>'
+      + '<span class="info-text">' + escapeHtml(forum.announcement) + '</span>'
       + '</div>';
   }
 
-  // 欢迎 & 说明
-  var welcomeHtml = '<div class="info-block">'
-    + '<div class="info-title">' + escapeHtml(info.welcome || forum.name) + '</div>'
-    + '<div class="info-text">' + escapeHtml(info.desc || forum.description) + '</div>'
-    + '</div>';
+  // 说明 + 彩蛋：合成一行注释（大标题已经由 banner 承担）
+  // 板块导航在 banner 的元素格里（js/banner.js）
+  var parts = [info.desc || forum.description, info.easter].filter(Boolean).map(function(t) {
+    return escapeHtml(String(t).replace(/^\/\/\s*/, ''));
+  });
+  var lineHtml = parts.length ? '<div class="info-line">// ' + parts.join('<span class="sep">·</span>') + '</div>' : '';
 
-  // 板块导航已移到 banner 的元素格（js/banner.js），这里不再重复渲染
+  el.innerHTML = announcementHtml + lineHtml;
+}
 
-  // 彩蛋
-  var easterHtml = '';
-  if (info.easter) {
-    easterHtml = '<div class="info-easter">' + escapeHtml(info.easter) + '</div>';
+// 系统之声：这些作者的发言按终端样式渲染
+var SYS_AUTHORS = ['CROVET'];
+function isSysAuthor(name) { return SYS_AUTHORS.indexOf(name) >= 0; }
+
+// 板块符号（和 banner 元素格一致）
+function boardSymbol(board) {
+  var m = (typeof BOARD_META !== 'undefined' && BOARD_META[board]) || null;
+  if (m && m.sym) return m.sym;
+  return /^[A-Za-z]/.test(board) ? board[0].toUpperCase() + (board[1] || '').toLowerCase() : board[0];
+}
+
+// 发帖区展开 / 收起
+function toggleComposer(force) {
+  var c = document.getElementById('composer');
+  var open = typeof force === 'boolean' ? force : !c.classList.contains('open');
+  c.classList.toggle('open', open);
+  document.getElementById('composerToggle').setAttribute('aria-expanded', open);
+  if (open) {
+    var t = document.getElementById(document.getElementById('tab-ai').classList.contains('active') ? 'aiTopic' : 'userTitle');
+    if (t) t.focus({ preventScroll: true });
   }
-
-  el.innerHTML = announcementHtml + welcomeHtml + easterHtml;
 }
 
 // 当前选中板块
@@ -258,6 +274,7 @@ function userPost() {
 
   document.getElementById('userTitle').value = '';
   document.getElementById('userContent').value = '';
+  toggleComposer(false);
   renderPosts();
   toast('发帖成功！');
 
@@ -551,20 +568,22 @@ function renderPosts() {
   var filterHtml = '';
   if (currentBoard) {
     filterHtml = '<div class="filter-bar">'
-      + '<span class="filter-label">📂 ' + escapeHtml(currentBoard) + '</span>'
-      + '<button class="btn-filter-clear" onclick="selectBoard(\'\')">✕ 显示全部</button>'
+      + '<span class="filter-label"><span class="dim">FILTER</span>' + escapeHtml(currentBoard) + '</span>'
+      + '<button class="btn-filter-clear" onclick="selectBoard(\'\')">× 显示全部</button>'
       + '</div>';
   }
 
   if (posts.length === 0) {
     feed.innerHTML = filterHtml + '<div class="empty-state">'
-      + (currentBoard ? '「' + escapeHtml(currentBoard) + '」还没有帖子' : '还没有帖子，发一个吧 ✨')
+      + (currentBoard ? '「' + escapeHtml(currentBoard) + '」还没有帖子' : '还没有帖子，发一个吧')
       + '</div>';
     return;
   }
 
   feed.innerHTML = filterHtml + posts.map(function(p) {
-    var boardTag = p.board ? '<span class="board-tag">' + escapeHtml(p.board) + '</span>' : '';
+    var boardTag = p.board
+      ? '<span class="board-tag" onclick="selectBoard(\'' + escapeAttr(p.board) + '\')" title="只看这个板块"><b>' + escapeHtml(boardSymbol(p.board)) + '</b>' + escapeHtml(p.board) + '</span>'
+      : '';
     var isAnon = p.board === '匿名投稿箱';
     var comments = (p.comments || []).map(function(c, ci) {
       var cName = isAnon ? uiIcon('mask', 13) + ' 匿名' : '@' + escapeHtml(c.author);
@@ -574,7 +593,7 @@ function renderPosts() {
         replyTag = '<span class="reply-tag">回复 @' + rtName + '</span> ';
       }
       var replyBtn = '<button class="btn-reply-inline" onclick="setReplyTarget(\'' + p.id + '\',' + ci + ')">回复</button>';
-      return '<div class="comment">'
+      return '<div class="comment' + (isSysAuthor(c.author) ? ' is-sys' : '') + '">'
         + '<span class="comment-author">' + cName + '</span>'
         + '<span class="comment-time">' + escapeHtml(c.time) + '</span>'
         + replyBtn
@@ -583,9 +602,9 @@ function renderPosts() {
     }).join('');
 
     var pName = isAnon ? uiIcon('mask') + ' 匿名' : '@' + escapeHtml(p.author);
-    var pinnedTag = p.pinned ? '<span class="board-tag" style="background:#e74c3c;color:#fff">' + uiIcon('pin') + ' 置顶</span>' : '';
-    var viewsTag = p.views ? '<span class="btn-action" style="cursor:default">' + uiIcon('eye') + ' ' + p.views + '</span>' : '';
-    return '<article class="post-card">'
+    var pinnedTag = p.pinned ? '<span class="pin-tag">' + uiIcon('pin', 12) + ' 置顶</span>' : '';
+    var viewsTag = p.views ? '<span class="post-views" title="浏览">' + uiIcon('eye', 12) + ' ' + p.views + '</span>' : '';
+    return '<article class="post-card' + (!isAnon && isSysAuthor(p.author) ? ' is-sys' : '') + '">'
       + '<div class="post-header">'
       + '<span class="post-author">' + pName + '</span>'
       + boardTag + pinnedTag
@@ -598,11 +617,11 @@ function renderPosts() {
       + '<button class="btn-action" onclick="likePost(\'' + p.id + '\')">' + uiIcon('thumb') + ' ' + (p.likes || 0) + '</button>'
       + '<button class="btn-action" onclick="triggerReply(\'' + p.id + '\')">' + uiIcon('chat') + ' ' + (p.comments || []).length + '</button>'
       + '<button class="btn-action" onclick="exportPostCard(\'' + p.id + '\')">' + uiIcon('download') + '</button>'
-      + '<button class="btn-action" onclick="deletePost(\'' + p.id + '\')">' + uiIcon('trash') + '</button>'
+      + '<button class="btn-action danger" onclick="deletePost(\'' + p.id + '\')" title="删除">' + uiIcon('trash') + '</button>'
       + '</div>'
       + '<div class="comments-section">' + comments + '</div>'
       + '<div class="reply-box">'
-      + '<div class="reply-target-bar" id="reply-target-' + p.id + '" style="display:none"></div>'
+      + '<div class="reply-target-bar" id="reply-target-' + p.id + '"></div>'
       + '<input class="reply-input" id="reply-' + p.id + '" placeholder="写回复…" onkeydown="if(event.key===\'Enter\')userReply(\'' + p.id + '\')">'
       + '<button class="btn-reply" onclick="userReply(\'' + p.id + '\')">回复</button>'
       + '</div>'
@@ -775,9 +794,9 @@ function exportPostCard(id) {var forumId = getActiveForum();
 function showCardPreview(dataUrl) {
   var overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
-  overlay.innerHTML = '<p style="color:#fff;font-size:13px;margin-bottom:12px;">长按图片保存 👇</p>'
-    + '<img src="' + dataUrl + '" style="max-width:90%;max-height:75vh;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.5);">'
-    + '<button style="margin-top:16px;padding:8px 24px;background:#333;color:#fff;border:none;border-radius:6px;font-size:14px;" onclick="this.parentElement.remove()">关闭</button>';
+  overlay.innerHTML = '<p class="export-tip">长按图片保存</p>'
+    + '<img class="export-img" src="' + dataUrl + '" alt="帖子卡片">'
+    + '<button class="btn-post export-close" onclick="this.parentElement.remove()">关闭</button>';
   document.body.appendChild(overlay);
   toast('📸 长按图片可保存！');
 }
@@ -1564,8 +1583,8 @@ function renderAdminPanel(el) {
     + '<input class="form-input" id="adminNewPwd" placeholder="留空不修改" type="password">'
     + '</div>'
     + '<div class="composer-footer">'
-    + '<button class="btn-post" style="background:#c33" onclick="doAdminLogout()">退出管理员</button>'
-    + '<button class="btn-post" style="background:#833" onclick="clearAll()">🗑️ 清空帖子</button>'
+    + '<button class="btn-post btn-cancel" onclick="doAdminLogout()">退出管理员</button>'
+    + '<button class="btn-post btn-danger" onclick="clearAll()">' + uiIcon('trash', 13) + ' 清空帖子</button>'
     + '<button class="btn-post btn-cancel" onclick="closeAdmin()">取消</button>'
     + '<button class="btn-post" onclick="saveAdminChanges()">保存</button>'
     + '</div>';
@@ -1642,7 +1661,7 @@ function showCharCard(char) {
   var overlay = document.createElement('div');
   overlay.className = 'char-card-overlay';
   var cardImg = char.fullImage || char.avatarImage || '';
-  var imgHtml = cardImg ? '<img src="' + cardImg + '">' : '<div style="font-size:48px;text-align:center;padding:20px">' + (char.emoji || '?') + '</div>';
+  var imgHtml = cardImg ? '<img src="' + cardImg + '">' : '<div class="card-emoji">' + (char.emoji || '?') + '</div>';
   overlay.innerHTML = '<div class="char-card rarity-' + (char.rarity || 'common') + '">'
     + '<div class="char-card-titlebar"><span>STEM-IX // 用户档案</span><span class="card-close" onclick="this.closest(\'.char-card-overlay\').remove()" style="cursor:pointer">✕</span></div>'
     + '<div class="char-card-body">'
@@ -1651,7 +1670,7 @@ function showCharCard(char) {
     + '<div class="card-name">' + escapeHtml(char.name) + '</div>'
     + '<div class="card-realname">' + escapeHtml(char.bio ? char.bio.split('。')[0] : '') + '</div>'
     + '<div class="card-bio">' + escapeHtml(char.bio || char.style.slice(0, 80) + '…') + '</div>'
-    + '<div style="font-size:10px;color:var(--text2);margin-top:8px;font-family:var(--font)">已识别 ' + getCardCount() + '/' + getMainCharCount() + ' 名用户</div>'
+    + '<div class="card-count">已识别 ' + getCardCount() + '/' + getMainCharCount() + ' 名用户</div>'
     + '</div></div></div>';
   document.body.appendChild(overlay);
   setTimeout(function() { overlay.classList.add('show'); }, 10);
@@ -1739,7 +1758,7 @@ function showAchievementPanel() {
   var overlay = document.createElement('div');
   overlay.className = 'char-card-overlay';
   overlay.innerHTML = '<div class="achievement-panel">'
-    + '<div class="card-close" onclick="this.parentElement.parentElement.remove()">✕</div>'
+    + '<button class="card-close panel-close" type="button" title="关闭" onclick="this.parentElement.parentElement.remove()">×</button>'
     + html + '</div>';
   document.body.appendChild(overlay);
   setTimeout(function() { overlay.classList.add('show'); }, 10);
@@ -1757,7 +1776,7 @@ function showCardDetail(charId) {
   var overlay = document.createElement('div');
   overlay.className = 'char-card-overlay';
   var detailImg = c.fullImage || c.avatarImage || '';
-  var detailImgHtml = detailImg ? '<img src="' + detailImg + '">' : '<div style="font-size:48px;text-align:center;padding:20px">' + (c.emoji || '?') + '</div>';
+  var detailImgHtml = detailImg ? '<img src="' + detailImg + '">' : '<div class="card-emoji">' + (c.emoji || '?') + '</div>';
   overlay.innerHTML = '<div class="char-card">'
     + '<div class="char-card-titlebar"><span>STEM-IX // 用户档案</span><span class="card-close" onclick="this.closest(\'.char-card-overlay\').remove()" style="cursor:pointer">\u2715</span></div>'
     + '<div class="char-card-body">'
@@ -1766,7 +1785,7 @@ function showCardDetail(charId) {
     + '<div class="card-name">' + escapeHtml(c.name) + '</div>'
     + '<div class="card-realname">' + escapeHtml(c.bio ? c.bio.split('\u3002')[0] : '') + '</div>'
     + '<div class="card-bio">' + escapeHtml(c.bio || c.style.slice(0, 80) + '\u2026') + '</div>'
-    + '<div style="font-size:10px;color:var(--text2);margin-top:8px;font-family:var(--font)">\u5df2\u8bc6\u522b ' + getCardCount() + '/' + getMainCharCount() + ' \u540d\u7528\u6237</div>'
+    + '<div class="card-count">\u5df2\u8bc6\u522b ' + getCardCount() + '/' + getMainCharCount() + ' \u540d\u7528\u6237</div>'
     + '</div></div></div>';
   document.body.appendChild(overlay);
   setTimeout(function() { overlay.classList.add('show'); }, 10);

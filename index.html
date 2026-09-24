@@ -6,7 +6,7 @@
   <meta name="description" content="STEM-IX · STEM Internal eXchange — AI 角色扮演内部论坛">
   <meta name="theme-color" content="#f5f5f0">
   <title>STEM-IX · ShardBB</title>
-  <link rel="stylesheet" href="css/style.css?v=104">
+  <link rel="stylesheet" href="css/style.css?v=105">
 </head>
 <body>
 
@@ -48,8 +48,12 @@
     </div>
   </div>
 
-  <!-- 发帖区 -->
-  <section class="composer">
+  <!-- 发帖区（默认收起） -->
+  <section class="composer" id="composer">
+    <button class="composer-toggle" id="composerToggle" type="button" aria-expanded="false" aria-controls="composerBody" onclick="toggleComposer()">
+      写点什么…<span class="ix-cur"></span><span class="hint-key">NEW POST</span>
+    </button>
+    <div class="composer-body" id="composerBody">
     <div class="composer-tabs">
 <button class="tab-btn active" data-tab="user" onclick="switchTab('user')"><span data-icon="pen" data-icon-size="14"></span> 我来发帖</button>
 <button class="tab-btn" data-tab="ai" onclick="switchTab('ai')"><span data-icon="diamond" data-icon-size="14"></span> 让角色发帖</button>
@@ -82,6 +86,7 @@
       <div class="composer-footer">
         <button class="btn-post" onclick="aiPost()"><span data-icon="sparkles" data-icon-size="14"></span> 随机角色发帖</button>
       </div>
+    </div>
     </div>
   </section>
 
@@ -250,7 +255,7 @@
 <script src="js/icons.js?v=100"></script>
 <script src="js/data.js?v=101"></script>
 <script src="js/api.js?v=100"></script>
-<script src="js/app.js?v=101"></script>
+<script src="js/app.js?v=102"></script>
 <script src="js/banner.js?v=100"></script>
 </body>
 </html>
