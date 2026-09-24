@@ -36,8 +36,12 @@ function syncDrawerUser() {
       av.textContent = p.avatar || '?';
     }
   }
-  var gl = document.getElementById('glossaryState');
-  if (gl && typeof glossaryEnabled !== 'undefined') gl.textContent = glossaryEnabled ? 'ON' : 'OFF';
+  if (typeof glossaryEnabled !== 'undefined') {
+    var gl = document.getElementById('glossaryState');
+    if (gl) gl.textContent = glossaryEnabled ? 'ON' : 'OFF';
+    var gb = document.getElementById('glossaryToggle');
+    if (gb) gb.classList.toggle('active', glossaryEnabled);
+  }
 }
 
 // 术语开关：包一层，顺便刷新抽屉里的 ON/OFF
