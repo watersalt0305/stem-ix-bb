@@ -6,7 +6,7 @@
   <meta name="description" content="STEM-IX · STEM Internal eXchange — AI 角色扮演内部论坛">
   <meta name="theme-color" content="#f5f5f0">
   <title>STEM-IX · ShardBB</title>
-  <link rel="stylesheet" href="css/style.css?v=105">
+  <link rel="stylesheet" href="css/style.css?v=110">
 </head>
 <body>
 
@@ -156,7 +156,7 @@
       </div>
       <div class="form-row">
         <label>API Base URL</label>
-        <div style="font-size:11px;color:var(--text2);margin-bottom:4px">留空使用内置API（无需配置即可使用）</div>
+        <div class="field-note">留空使用内置API（无需配置即可使用）</div>
         <input class="form-input" id="cfgUrl" placeholder="留空使用默认API，或填自己的URL">
       </div>
       <div class="form-row">
@@ -165,17 +165,17 @@
       </div>
       <div class="form-row">
         <label>模型</label>
-        <div style="display:flex;gap:6px;align-items:center">
-          <select class="form-input" id="cfgModel" style="flex:1"><option value="">-- 手动输入或拉取 --</option></select>
-          <button class="btn-post" style="padding:8px 12px;font-size:12px;white-space:nowrap" onclick="fetchModels()"><span data-icon="antenna" data-icon-size="13"></span> 拉取</button>
+        <div class="model-row">
+          <select class="form-input" id="cfgModel"><option value="">-- 手动输入或拉取 --</option></select>
+          <button class="btn-post btn-compact" onclick="fetchModels()"><span data-icon="antenna" data-icon-size="13"></span> 拉取</button>
         </div>
-<input class="form-input" id="cfgModelManual" placeholder="或手动输入模型名…" style="margin-top:6px">
+        <input class="form-input mt-2" id="cfgModelManual" placeholder="或手动输入模型名…">
         </div>
         <hr class="divider">
         <div class="form-row">
           <label>代理地址</label>
           <input class="form-input" id="cfgProxy" placeholder="direct = 直连(WebView), 或填代理URL">
-          <p class="hint" style="margin-top:4px;font-size:11px">WebView预览填 direct 即可；外部浏览器填 CF Worker 地址或本地代理</p>
+          <p class="field-note mt-2">WebView预览填 direct 即可；外部浏览器填 CF Worker 地址或本地代理</p>
         </div>
         <div class="composer-footer">
         <button class="btn-post btn-cancel" onclick="closeSettings()">取消</button>
@@ -243,7 +243,7 @@
         <div class="profile-avatar" id="profileAvatarPreview"></div>
         <div class="profile-avatar-actions">
           <button class="btn-sm" onclick="randomizeAvatar()"><span data-icon="dice" data-icon-size="13"></span> 随机头像</button>
-          <label class="btn-sm" style="cursor:pointer"><span data-icon="camera" data-icon-size="13"></span> 上传头像 <input type="file" accept="image/*" onchange="uploadAvatar(event)" style="display:none"></label>
+          <label class="btn-sm file-label"><span data-icon="camera" data-icon-size="13"></span> 上传头像 <input class="file-hidden" type="file" accept="image/*" onchange="uploadAvatar(event)"></label>
         </div>
       </div>
       <div class="form-row">
@@ -278,7 +278,7 @@
       <h3 id="welcomeTitle"></h3>
       <div class="welcome-body" id="welcomeBody"></div>
       <div class="composer-footer">
-        <label class="checkbox-label" style="margin-right:auto"><input type="checkbox" id="welcomeNoShow"> 本次不再显示</label>
+        <label class="checkbox-label push-left"><input type="checkbox" id="welcomeNoShow"> 本次不再显示</label>
         <button class="btn-post" onclick="closeWelcome()">进入</button>
       </div>
     </div>
@@ -287,10 +287,11 @@
   <div class="toast-container" id="toastContainer"></div>
   <div class="ix-notice" id="ixNotice" role="status"></div>
 
-<script src="js/icons.js?v=100"></script>
-<script src="js/data.js?v=101"></script>
-<script src="js/api.js?v=100"></script>
-<script src="js/app.js?v=102"></script>
-<script src="js/banner.js?v=100"></script>
+<script src="js/icons.js?v=110"></script>
+<script src="js/data.js?v=110"></script>
+<script src="js/api.js?v=110"></script>
+<script src="js/app.js?v=110"></script>
+<script src="js/shell.js?v=110"></script>
+<script src="js/banner.js?v=110"></script>
 </body>
 </html>
