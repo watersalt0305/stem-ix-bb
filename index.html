@@ -11,12 +11,16 @@
 <body>
 
   <!-- CROVET 状态条（通栏） -->
-  <div class="sys" aria-hidden="true"><div class="sys-inner">
+  <div class="sys"><div class="sys-inner">
     <span class="item" data-i="0"><span class="dot"></span>CROVET ONLINE</span>
     <span class="item dim">NODE 06</span>
     <span class="item dim">CLEARANCE C</span>
     <span class="item dim hide-m" id="ixClock">--:--:--</span>
     <span class="ticker hide-m"><span id="ixTick"></span><span class="ix-cur"></span></span>
+    <span class="sys-actions">
+      <button class="sys-btn user-btn" id="userBtn" onclick="openProfile()" title="我的资料"></button>
+      <button class="sys-btn" id="drawerBtn" onclick="toggleDrawer()" aria-expanded="false" aria-controls="drawer" title="菜单">≡ MENU</button>
+    </span>
   </div></div>
 
   <!-- Banner -->
