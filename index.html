@@ -37,20 +37,40 @@
     </div>
   </header>
 
-  <!-- 工具栏 -->
-  <div class="top-bar">
-    <img class="forum-logo" id="forumLogo" src="" alt="">
-    <span class="post-count-badge" id="postCount">0 帖</span>
-    <div class="header-actions">
-      <button class="btn-icon user-btn" onclick="openProfile()" title="我的资料" id="userBtn"></button>
-      <button class="btn-icon glossary-btn" id="glossaryToggle" onclick="toggleGlossary()" title="术语释义：关" data-icon="book"></button>
-      <button class="btn-icon glossary-list-btn" onclick="openGlossaryPanel()" title="术语速查表" data-icon="list"></button>
-      <button class="btn-icon" id="charBtn" onclick="openCharacters()" title="角色管理" style="display:none" data-icon="users"></button>
-      <button class="btn-icon" onclick="showAchievementPanel()" title="成就&角色卡" data-icon="spark"></button>
-      <button class="btn-icon" onclick="openSettings()" title="全局API设置" data-icon="gear"></button>
-      <button class="btn-icon" onclick="openAdmin()" title="管理员" data-icon="admin"></button>
-    </div>
+  <!-- 侧边抽屉（系统之声） -->
+  <div class="drawer" id="drawer">
+    <div class="drawer-mask" onclick="toggleDrawer(false)"></div>
+    <aside class="drawer-panel" aria-label="菜单">
+      <div class="drawer-head"><span>CROVET // MENU</span><button class="compose-close" onclick="toggleDrawer(false)" title="关闭" data-icon="close" data-icon-size="16"></button></div>
+      <div class="drawer-user">
+        <div class="drawer-avatar" id="drawerAvatar"></div>
+        <div class="drawer-user-meta">
+          <div class="drawer-user-label">USER · CLEARANCE C</div>
+          <div class="drawer-user-name" id="drawerUserName">—</div>
+        </div>
+      </div>
+      <div class="drawer-sec">
+        <div class="drawer-cap">// PROFILE</div>
+        <button class="drawer-item" onclick="drawerGo(openProfile)"><span data-icon="user" data-icon-size="14"></span>编辑资料</button>
+        <button class="drawer-item" onclick="drawerGo(showAchievementPanel)"><span data-icon="spark" data-icon-size="14"></span>成就 &amp; 角色卡</button>
+      </div>
+      <div class="drawer-sec">
+        <div class="drawer-cap">// FORUM</div>
+        <button class="drawer-item" onclick="drawerGo(function(){toggleComposer(true)})"><span data-icon="pen" data-icon-size="14"></span>发新帖</button>
+        <button class="drawer-item" onclick="drawerGo(openSummon)"><span data-icon="diamond" data-icon-size="14"></span>召唤角色发帖</button>
+        <button class="drawer-item glossary-btn" id="glossaryToggle" onclick="drawerToggleGlossary()" title="术语释义"><span data-icon="book" data-icon-size="14"></span>术语释义<span class="state" id="glossaryState">ON</span></button>
+        <button class="drawer-item" onclick="drawerGo(openGlossaryPanel)"><span data-icon="list" data-icon-size="14"></span>术语速查表</button>
+      </div>
+      <div class="drawer-sec">
+        <div class="drawer-cap">// SYSTEM</div>
+        <button class="drawer-item" onclick="drawerGo(openSettings)"><span data-icon="gear" data-icon-size="14"></span>全局 API 设置</button>
+        <button class="drawer-item" id="charBtn" onclick="drawerGo(openCharacters)" style="display:none"><span data-icon="users" data-icon-size="14"></span>角色管理</button>
+        <button class="drawer-item" onclick="drawerGo(openAdmin)"><span data-icon="admin" data-icon-size="14"></span>ADMIN</button>
+      </div>
+      <div class="drawer-foot">STEM-IX · SHARDBB · NODE 06</div>
+    </aside>
   </div>
+  <img class="forum-logo" id="forumLogo" src="" alt="">
 
   <!-- 发帖区（默认收起） -->
   <section class="composer" id="composer">
