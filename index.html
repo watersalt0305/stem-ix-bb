@@ -77,40 +77,34 @@
     <button class="composer-toggle" id="composerToggle" type="button" aria-expanded="false" aria-controls="composerBody" onclick="toggleComposer()">
       写点什么…<span class="ix-cur"></span><span class="hint-key">NEW POST</span>
     </button>
-    <div class="composer-body" id="composerBody">
-    <div class="composer-tabs">
-<button class="tab-btn active" data-tab="user" onclick="switchTab('user')"><span data-icon="pen" data-icon-size="14"></span> 我来发帖</button>
-<button class="tab-btn" data-tab="ai" onclick="switchTab('ai')"><span data-icon="diamond" data-icon-size="14"></span> 让角色发帖</button>
-    </div>
-
-    <div class="form-row">
-      <label>板块</label>
-      <select class="form-input" id="boardSelect"></select>
-    </div>
-
-    <div class="tab-content active" id="tab-user">
-      <div class="form-row">
-        <label>标题</label>
-        <input class="form-input" id="userTitle" placeholder="帖子标题…" maxlength="60">
+    <div class="composer-body" id="composerBody" role="dialog" aria-label="发新帖">
+      <div class="compose-head"><span>NEW THREAD // 发新帖</span><button class="compose-close" type="button" onclick="toggleComposer(false)" title="关闭（Esc）" data-icon="close" data-icon-size="16"></button></div>
+      <div class="tab-content active" id="tab-user">
+        <div class="compose-grid">
+          <label for="boardSelect">板块</label>
+          <select class="form-input" id="boardSelect"></select>
+          <label for="userTitle">标题</label>
+          <input class="form-input compose-title" id="userTitle" placeholder="帖子标题…" maxlength="60">
+        </div>
+        <div class="compose-editor">
+          <textarea class="form-input" id="userContent" placeholder="正文…  支持 **粗体** *斜体* ~~删除线~~ &gt; 引用  @角色名 可点名回帖" maxlength="500"></textarea>
+          <div class="ed-bar">
+            <button class="ed-btn" type="button" onclick="edInsert('**','**','粗体')" title="粗体"><b>B</b></button>
+            <button class="ed-btn" type="button" onclick="edInsert('*','*','斜体')" title="斜体"><i>I</i></button>
+            <button class="ed-btn" type="button" onclick="edInsert('~~','~~','删除线')" title="删除线"><s>S</s></button>
+            <button class="ed-btn" type="button" onclick="edQuote()" title="引用">&gt;</button>
+            <button class="ed-btn" type="button" onclick="edInsert('`','`','code')" title="行内代码">&lt;/&gt;</button>
+            <button class="ed-btn" type="button" onclick="edInsert('@','','')" title="点名角色">@</button>
+            <span class="char-count" id="charCount">0/500</span>
+          </div>
+        </div>
+        <div class="compose-foot">
+          <span class="compose-as">以 <b id="composeAs">@—</b> 身份发布</span>
+          <button class="btn-post btn-cancel" type="button" onclick="toggleComposer(false)">取消</button>
+          <button class="btn-post" type="button" onclick="userPost()">发布帖子</button>
+        </div>
       </div>
-      <div class="form-row">
-        <label>内容</label>
-        <textarea class="form-input" id="userContent" placeholder="写点什么…" maxlength="500"></textarea>
-      </div>
-      <div class="composer-footer">
-        <button class="btn-post" onclick="userPost()">发布帖子</button>
-      </div>
-    </div>
-
-    <div class="tab-content" id="tab-ai">
-      <div class="form-row">
-        <label>给角色一个话题（可选）</label>
-        <textarea class="form-input" id="aiTopic" placeholder="留空则随机选话题…" maxlength="200"></textarea>
-      </div>
-      <div class="composer-footer">
-        <button class="btn-post" onclick="aiPost()"><span data-icon="sparkles" data-icon-size="14"></span> 随机角色发帖</button>
-      </div>
-    </div>
+      <div id="tab-ai" hidden></div>
     </div>
   </section>
 
@@ -118,7 +112,24 @@
   <section class="forum-info" id="forumInfo"></section>
 
   <!-- 帖子流 -->
+  <div class="feed-head"><span>■ FEED // 帖子</span><span class="post-count-badge" id="postCount">0 帖</span></div>
   <section class="feed" id="feed"></section>
+
+  <!-- 召唤角色发帖（系统窗口） -->
+  <div class="overlay" id="summonOverlay" onclick="if(event.target===this)closeSummon()">
+    <div class="modal">
+      <h3><span data-icon="diamond" data-icon-size="16"></span> REQUEST POST · 召唤角色发帖</h3>
+      <div class="form-row">
+        <label for="aiTopic">给角色一个话题（可选）</label>
+        <textarea class="form-input" id="aiTopic" placeholder="留空则随机选话题…" maxlength="200"></textarea>
+      </div>
+      <p class="field-note">板块沿用「发新帖」里选中的板块；未选则按角色随机分配。</p>
+      <div class="composer-footer">
+        <button class="btn-post btn-cancel" onclick="closeSummon()">取消</button>
+        <button class="btn-post" onclick="summonPost()"><span data-icon="sparkles" data-icon-size="14"></span> 执行</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 非阻塞状态条 -->
   <div class="status-bar" id="statusBar"></div>
