@@ -1310,6 +1310,9 @@ input[type="checkbox"] { accent-color: var(--ink); width: 14px; height: 14px; }
 .drawer-item:hover, .drawer-item:focus-visible { background: var(--sys-text); color: var(--sys-bg); outline: none; }
 .drawer-item:hover::before, .drawer-item:hover .sx-icon, .drawer-item:hover .state { color: var(--sys-bg); }
 .drawer-item.danger:hover { background: var(--danger); color: #fff; }
+.drawer-item.glossary-btn, .drawer-item.glossary-btn.active { color: var(--sys-text); border-color: transparent; }
+.drawer-item.glossary-btn.active .state { color: var(--sys-text); }
+.drawer-item.glossary-btn:hover .state { color: var(--sys-bg); }
 .drawer-foot { margin-top: auto; padding: var(--sp-3); color: var(--sys-dim); font-size: 10px; letter-spacing: 1px; border-top: 1px solid #33332f; }
 
 /* ---------- 发帖页（composer.open 时浮起为独立窗口） ---------- */
